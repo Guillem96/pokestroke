@@ -11,7 +11,7 @@ int main()
 	SearchAndSetResourceDir("resources");
 
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_TRANSPARENT);
-	InitWindow(512, 512, "Hello Raylib");
+	InitWindow(256, 256, "PokeStroke");
 	SetWindowState(FLAG_WINDOW_UNDECORATED); // Hide border/titlebar; omit if you want them there.
 	SetTargetFPS(16);
 
@@ -37,8 +37,6 @@ int main()
 			TraceLog(LOG_INFO, "Global Key Pressed: %d", key);
 			GameManagerUpdate(manager);
 		}
-
-		GameManagerUpdate(manager);
 
 		BeginDrawing();
 
