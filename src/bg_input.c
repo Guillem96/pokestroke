@@ -1,4 +1,5 @@
 #include "bg_input.h"
+#include "raylib.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,6 +25,12 @@ int GetBackgroundAnyKeyPressed()
         }
     }
     return 0;
+}
+Vector2 GetMouseScreenPosition()
+{
+    POINT p;
+    GetCursorPos(&p);
+    return (Vector2){(float)p.x, (float)p.y};
 }
 
 #elif __APPLE__
@@ -67,6 +74,16 @@ int GetBackgroundAnyKeyPressed()
     }
     return -1; // Using -1 for 'none' because 0 is the letter 'A' on Mac!
 }
+
+Vector2 GetMouseScreenPosition()
+{
+    // Queries the global mouse position from the Quartz window server
+    CGEventRef event = CGEventCreate(NULL);
+    CGPoint cursor = CGEventGetLocation(event);
+    CFRelease(event);
+    return (Vector2){(float)cursor.x, (float)cursor.y};
+}
+
 #endif
 
 // This handles the "Pressed" logic for ALL platforms

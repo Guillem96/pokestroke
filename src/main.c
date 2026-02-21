@@ -5,15 +5,18 @@
 #include "resource_dir.h"
 #include "game_manager.h"
 #include "gameboy_frame.h"
+#include "window_dragger.h"
 
 int main()
 {
 	SearchAndSetResourceDir("resources");
 
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_TRANSPARENT);
+	// Behave as an overlay
+	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_TRANSPARENT | FLAG_WINDOW_HIGHDPI);
 	InitWindow(256, 256, "PokeStroke");
-	SetWindowState(FLAG_WINDOW_UNDECORATED); // Hide border/titlebar; omit if you want them there.
-	SetTargetFPS(16);
+	SetWindowState(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TOPMOST);
+
+	SetTargetFPS(30);
 
 	InitBackgroundInput();
 
@@ -23,6 +26,9 @@ int main()
 	GameBoyFrameInit();
 
 	GameManagerUpdate(manager);
+
+	WindowDraggerInit();
+
 	while (!WindowShouldClose())
 	{
 		int key = GetBackgroundAnyKeyPressed();
@@ -34,20 +40,21 @@ int main()
 
 		if (key != -1)
 		{
-			TraceLog(LOG_INFO, "Global Key Pressed: %d", key);
 			GameManagerUpdate(manager);
 		}
+		GameManagerUpdate(manager);
+
+		WindowDraggerUpdate();
 
 		BeginDrawing();
-
-		ClearBackground((Color){248, 248, 248, 255});
+		ClearBackground(BLANK);
 		GameBoyFrameDraw(256);
 		GameManagerDraw(manager);
 		EndDrawing();
 	}
 
 	GameBoyFrameFree();
-
+	GameManagerUnload(manager);
 	CloseWindow();
 	return 0;
 }

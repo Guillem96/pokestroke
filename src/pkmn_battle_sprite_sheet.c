@@ -47,7 +47,6 @@ void BattleSpriteSheetInit(PokemonBattleSpriteSheet *sheet, const char *filename
     sheet->texture = LoadTextureFromImage(img);
     UnloadImage(img);
     TraceLog(LOG_INFO, "Loaded Pokemon Sprite Sheet: %s (id: %d, width: %d, height: %d)", filename, sheet->texture.id, sheet->texture.width, sheet->texture.height);
-
     if (sheet->texture.id == 0)
     {
         TraceLog(LOG_ERROR, "Texture not loaded!");
