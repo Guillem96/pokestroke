@@ -9,44 +9,60 @@
 #include "pkmn_battle_sprite_sheet.h"
 #include "pokeball_anim.h"
 #include "pkmn_spawn_anim.h"
+#include "dialog_box.h"
 
+// "Business" logic functions
 static void SpawnRandomPokemon(GameManager *manager);
 static void RollCatchResult(GameManager *manager);
 static void RollPokemonFlee(GameManager *manager);
+
+// Hooks to finalize complex states
+static void FinalizeCatchFailureState(GameManager *manager);
+static void FinalizePokedexRegisterState(GameManager *manager);
+static void FinalizePokemonFleeState(GameManager *manager);
+
+// Hooks to initialize complex states
+static void InitPokeballThrowState(GameManager *manager);
+static void InitPokemonSpawnState(GameManager *manager);
+
+// Start animations
 static void StartSpawnAnimation(GameManager *manager);
 static void StartPokeballAnimation(GameManager *manager);
 static void StartShrinkAnimation(GameManager *manager);
 static void StartGrowAnimation(GameManager *manager);
 
+// Sub-update functions
 static void SpawnPokemonPhaseUpdate(GameManager *manager);
 static void RegisterCatchResultPhaseUpdate(GameManager *manager);
 static void ThrowPokeballPhaseUpdate(GameManager *manager);
 static void CatchFailurePhaseUpdate(GameManager *manager);
 
+// Helpers
 static void ClearContextForNextRound(GameManager *manager, unsigned short clearSpawnedPokemon, unsigned short clearCatchResult);
 
 void GameManagerInit(GameManager *manager, const char *filePath)
 {
     SetRandomSeed((unsigned int)time(NULL));
     srand((unsigned int)time(NULL));
+
     manager->gameState = (GameState *)malloc(sizeof(GameState));
     if (manager->gameState == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for GameState.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for GameState.\n");
         exit(1);
     }
 
     manager->sheet = (PokemonSpriteSheet *)malloc(sizeof(PokemonSpriteSheet));
     if (manager->sheet == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PokemonSpriteSheet.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PokemonSpriteSheet.\n");
         exit(1);
     }
 
     manager->battleSheet = (PokemonBattleSpriteSheet *)malloc(sizeof(PokemonBattleSpriteSheet));
     if (manager->battleSheet == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PokemonBattleSpriteSheet.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PokemonBattleSpriteSheet.\n");
         exit(1);
     }
 
@@ -65,7 +81,7 @@ void GameManagerInit(GameManager *manager, const char *filePath)
     manager->bottomDialog = (DialogBox *)malloc(sizeof(DialogBox));
     if (manager->bottomDialog == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for DialogBox.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for DialogBox.\n");
         exit(1);
     }
     DialogBoxInit(manager->bottomDialog, "Guillem", 1, (Rectangle){55, 170, 145, 40});
@@ -81,20 +97,15 @@ void GameManagerUpdate(GameManager *manager)
     DialogBoxUpdate(manager->bottomDialog);
     if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH && manager->bottomDialog->isComplete)
     {
-        TraceLog(LOG_INFO, "Catch registration dialog complete, cleaning up and preparing for next spawn");
-        ClearContextForNextRound(manager, 1, 1);
-        manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
+        FinalizePokedexRegisterState(manager);
     }
     else if (manager->currentState == GAME_MANAGER_STATE_CATCH_FAILURE && manager->bottomDialog->isComplete)
     {
-        RollPokemonFlee(manager);
-        free(manager->growAnim);
-        manager->growAnim = NULL;
+        FinalizeCatchFailureState(manager);
     }
     else if (manager->currentState == GAME_MANAGER_STATE_POKEMON_FLEEING && manager->bottomDialog->isComplete)
     {
-        ClearContextForNextRound(manager, 1, 1);
-        manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
+        FinalizePokemonFleeState(manager);
     }
     else if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH || manager->currentState == GAME_MANAGER_STATE_POKEMON_FLEEING)
     {
@@ -109,21 +120,12 @@ void GameManagerUpdate(GameManager *manager)
 
     if (manager->currentState == GAME_MANAGER_STATE_SPAWN_POKEMON && manager->spawnedPokemon == NULL)
     {
-        SpawnRandomPokemon(manager);
-        StartSpawnAnimation(manager);
+        InitPokemonSpawnState(manager);
     }
-
     else if (manager->currentState == GAME_MANAGER_STATE_SPAWN_POKEMON)
     {
         SpawnPokemonPhaseUpdate(manager);
     }
-
-    else if (manager->currentState == GAME_MANAGER_STATE_ROLL_CATCH_RESULT && manager->catchResult == NULL)
-    {
-        RollCatchResult(manager);
-        StartPokeballAnimation(manager);
-    }
-
     else if (manager->currentState == GAME_MANAGER_STATE_THROWING_POKEBALL)
     {
         ThrowPokeballPhaseUpdate(manager);
@@ -156,11 +158,6 @@ void GameManagerDraw(const GameManager *manager)
         PkmnGrowAnimDraw(manager->growAnim);
     }
 
-    if (manager->currentState != GAME_MANAGER_STATE_CATCH_FAILURE && manager->currentState != GAME_MANAGER_STATE_SPAWN_POKEMON && manager->currentState != GAME_MANAGER_STATE_THROWING_POKEBALL && manager->currentState != GAME_MANAGER_STATE_REGISTERING_CATCH)
-    {
-        PkmnSpriteSheetDraw(manager->sheet, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant, POKEMON_POSITION);
-    }
-
     if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH)
     {
         BattleSpriteSheetPokeballDraw(
@@ -184,6 +181,34 @@ void GameManagerUnload(GameManager *manager)
 
     BattleSpriteSheetUnload(manager->battleSheet);
     free(manager->battleSheet);
+
+    DialogBoxUnload(manager->bottomDialog);
+    free(manager->bottomDialog);
+
+    if (manager->spawnedPokemon != NULL)
+    {
+        free(manager->spawnedPokemon);
+    }
+
+    if (manager->pokeballAnim != NULL)
+    {
+        free(manager->pokeballAnim);
+    }
+
+    if (manager->shrinkAnim != NULL)
+    {
+        free(manager->shrinkAnim);
+    }
+
+    if (manager->spawnAnim != NULL)
+    {
+        free(manager->spawnAnim);
+    }
+
+    if (manager->growAnim != NULL)
+    {
+        free(manager->growAnim);
+    }
 }
 
 static void SpawnRandomPokemon(GameManager *manager)
@@ -196,13 +221,12 @@ static void SpawnRandomPokemon(GameManager *manager)
 
     unsigned int pokemonId = GetRandomValue(0, POKEMON_COUNT - 1);
     float variantRoll = (float)rand() / (float)RAND_MAX;
-    TraceLog(LOG_INFO, "Spawned Pokemon ID: %d, variantRoll: %f", pokemonId, variantRoll);
     unsigned short variant;
     if (variantRoll < PKMN_BW_PROBABILITY)
     {
         variant = PKMN_VARIANT_BW;
     }
-    else if (variantRoll < PKMN_SHYNY_PROBABILITY)
+    else if (variantRoll < PKMN_SHINY_PROBABILITY)
     {
         variant = PKMN_VARIANT_SHINY;
     }
@@ -214,7 +238,7 @@ static void SpawnRandomPokemon(GameManager *manager)
     manager->spawnedPokemon = (SpawnedPokemon *)malloc(sizeof(SpawnedPokemon));
     if (manager->spawnedPokemon == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for SpawnedPokemon.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for SpawnedPokemon.\n");
         exit(1);
     }
 
@@ -235,8 +259,7 @@ static void SpawnPokemonPhaseUpdate(GameManager *manager)
         free(manager->spawnAnim);
         manager->spawnAnim = NULL;
 
-        // When spawning animation finishes, we want to immediately roll for catch result
-        manager->currentState = GAME_MANAGER_STATE_ROLL_CATCH_RESULT;
+        InitPokeballThrowState(manager);
     }
 }
 
@@ -326,7 +349,7 @@ static void RollCatchResult(GameManager *manager)
     manager->catchResult = (PokemonCatchResult *)malloc(sizeof(PokemonCatchResult));
     if (manager->catchResult == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PokemonCatchResult.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PokemonCatchResult.\n");
         exit(1);
     }
 
@@ -382,11 +405,6 @@ static void RollPokemonFlee(GameManager *manager)
         DialogBoxClearAndUpdateText(manager->bottomDialog, "Oh no! The POKéMON\nfled!  ");
         manager->currentState = GAME_MANAGER_STATE_POKEMON_FLEEING;
     }
-    else
-    {
-        RollCatchResult(manager);
-        StartPokeballAnimation(manager);
-    }
 }
 
 static void StartSpawnAnimation(GameManager *manager)
@@ -394,7 +412,7 @@ static void StartSpawnAnimation(GameManager *manager)
     manager->spawnAnim = (PokemonSpawnAnimation *)malloc(sizeof(PokemonSpawnAnimation));
     if (manager->spawnAnim == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PokemonSpawnAnimation.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PokemonSpawnAnimation.\n");
         exit(1);
     }
     PokemonSpawnAnimationInit(
@@ -407,7 +425,7 @@ void StartPokeballAnimation(GameManager *manager)
     manager->pokeballAnim = (PokeballAnim *)malloc(sizeof(PokeballAnim));
     if (manager->pokeballAnim == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PokeballAnim.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PokeballAnim.\n");
         exit(1);
     }
     PokeballAnimInit(
@@ -417,9 +435,6 @@ void StartPokeballAnimation(GameManager *manager)
         (Vector2){POKEMON_POSITION.x + PKMN_WIDTH / 2, POKEMON_POSITION.y + PKMN_HEIGHT},
         manager->catchResult->pokeballType,
         manager->catchResult->nShakes, manager->catchResult->isSuccessful);
-    manager->currentState = GAME_MANAGER_STATE_THROWING_POKEBALL;
-
-    StartShrinkAnimation(manager);
 }
 
 static void StartShrinkAnimation(GameManager *manager)
@@ -427,7 +442,7 @@ static void StartShrinkAnimation(GameManager *manager)
     manager->shrinkAnim = (PkmnShrinkAnim *)malloc(sizeof(PkmnShrinkAnim));
     if (manager->shrinkAnim == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PkmnShrinkAnim.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PkmnShrinkAnim.\n");
         exit(1);
     }
     PkmnShrinkAnimInit(
@@ -443,7 +458,7 @@ static void StartGrowAnimation(GameManager *manager)
     manager->growAnim = (PkmnGrowAnim *)malloc(sizeof(PkmnGrowAnim));
     if (manager->growAnim == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for PkmnGrowAnim.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PkmnGrowAnim.\n");
         exit(1);
     }
     PkmnGrowAnimInit(
@@ -452,4 +467,45 @@ static void StartGrowAnimation(GameManager *manager)
         manager->spawnedPokemon->pokemonId,
         manager->spawnedPokemon->variant,
         POKEMON_POSITION);
+}
+
+static void InitPokemonSpawnState(GameManager *manager)
+{
+    SpawnRandomPokemon(manager);
+    StartSpawnAnimation(manager);
+}
+
+static void InitPokeballThrowState(GameManager *manager)
+{
+    RollCatchResult(manager);
+    StartPokeballAnimation(manager);
+    StartShrinkAnimation(manager);
+    manager->currentState = GAME_MANAGER_STATE_THROWING_POKEBALL;
+}
+
+static void FinalizeCatchFailureState(GameManager *manager)
+{
+    RollPokemonFlee(manager);
+
+    free(manager->growAnim);
+    manager->growAnim = NULL;
+
+    if (manager->currentState != GAME_MANAGER_STATE_POKEMON_FLEEING)
+    {
+        // If pokemon doesn't run away, restart pokeball throwing
+        InitPokeballThrowState(manager);
+    }
+}
+
+static void FinalizePokedexRegisterState(GameManager *manager)
+{
+
+    ClearContextForNextRound(manager, 1, 1);
+    manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
+}
+
+static void FinalizePokemonFleeState(GameManager *manager)
+{
+    ClearContextForNextRound(manager, 1, 1);
+    manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
 }

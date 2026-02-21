@@ -17,6 +17,6 @@ void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectan
 void DialogBoxClearAndUpdateText(DialogBox *box, const char *text);
 void DialogBoxUpdate(DialogBox *box);
 void DialogBoxDraw(const DialogBox *box);
-void DialogBoxFree(DialogBox *box);
+void DialogBoxUnload(DialogBox *box);
 
 #endif // DIALOG_BOX_H

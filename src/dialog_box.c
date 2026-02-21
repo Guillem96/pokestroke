@@ -55,6 +55,6 @@ void DialogBoxDraw(const DialogBox *box)
     DrawText(ss, box->bounds.x + 8, box->bounds.y + 8, 13, BLACK);
 }
 
-void DialogBoxFree(DialogBox *box)
+void DialogBoxUnload(DialogBox *box)
 {
 }
