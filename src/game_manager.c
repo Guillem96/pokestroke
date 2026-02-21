@@ -149,7 +149,7 @@ void GameManagerDraw(const GameManager *manager)
     {
         PkmnBattleSpriteSheetDrawPkmnName(
             manager->battleSheet, POKEMON_NAMES[manager->spawnedPokemon->pokemonId],
-            &manager->gameState->pokedex->registered[manager->spawnedPokemon->pokemonId * 3],
+            &manager->gameState->pokedex->registered[manager->spawnedPokemon->pokemonId * PKMN_VARIANTS],
             POKEMON_NAME_POSITION.x, POKEMON_NAME_POSITION.y);
     }
 
@@ -226,7 +226,6 @@ static void SpawnRandomPokemon(GameManager *manager)
     }
 
     unsigned int pokemonId = GetRandomValue(0, POKEMON_COUNT - 1);
-    TraceLog(LOG_INFO, "Spawned pokemon %d, regular status %d, shiny status %d and bw status %d", pokemonId, manager->gameState->pokedex->registered[pokemonId * 3], manager->gameState->pokedex->registered[pokemonId * 3 + 1], manager->gameState->pokedex->registered[pokemonId * 3 + 2]);
     float variantRoll = (float)rand() / (float)RAND_MAX;
     unsigned short variant;
     if (variantRoll < PKMN_BW_PROBABILITY)

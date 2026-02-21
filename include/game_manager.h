@@ -10,13 +10,13 @@
 #include "pkmn_shrink_anim.h"
 #include "pkmn_grow_anim.h"
 
-#define POKEMON_POSITION (Vector2){140, 90}
+#define POKEMON_POSITION (Vector2){135, 95}
 #define POKEBALL_THROW_START_POSITION (Vector2){60, 180}
 #define POKEMON_NAME_POSITION (Vector2){60, 75}
 
 #define PKMN_SHINY_PROBABILITY 0.01f
 #define PKMN_BW_PROBABILITY 0.005f
-#define PKMN_CATCH_SUCCESS_PROBABILITY 0.80f
+#define PKMN_CATCH_SUCCESS_PROBABILITY 0.15f
 
 #define ULTRABALL_MULTIPLIER 2.f
 #define GREATBALL_MULTIPLIER 1.5f

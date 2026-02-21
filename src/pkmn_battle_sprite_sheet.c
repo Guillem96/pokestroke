@@ -127,12 +127,16 @@ void PkmnBattleSpriteSheetDrawPkmnName(PkmnBattleSpriteSheet *sheet, const char 
     Rectangle notCaughtIndicatorSourceRect = {
         PKMN_NON_CAUGHT_INDIDATOR_OFFSET_X,
         PKMN_NON_CAUGHT_INDIDATOR_OFFSET_Y,
-        PKMN_INDICATOR_SIZE, PKMN_INDICATOR_SIZE};
+        PKMN_INDICATOR_SIZE - 1, PKMN_INDICATOR_SIZE - 1};
 
     for (int i = 0; i < 3; i++)
     {
-        destRec = (Rectangle){indicatorX + (i * PKMN_INDICATOR_SIZE), y, PKMN_INDICATOR_SIZE, PKMN_INDICATOR_SIZE};
-        if (isCaught[i] == POKEDEX_REGISTERED)
+        bool isRegistered = isCaught[i] == POKEDEX_REGISTERED;
+        destRec = (Rectangle){
+            indicatorX + (i * (PKMN_INDICATOR_SIZE + 2)),
+            y + !isRegistered * 0.5,
+            PKMN_INDICATOR_SIZE - !isRegistered, PKMN_INDICATOR_SIZE - !isRegistered};
+        if (isRegistered)
         {
             DrawTexturePro(sheet->texture, caughtIndicatorSourceRect, destRec, origin, 0.0f, WHITE);
         }

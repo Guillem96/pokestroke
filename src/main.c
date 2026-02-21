@@ -42,7 +42,6 @@ int main()
 		{
 			GameManagerUpdate(manager);
 		}
-		GameManagerUpdate(manager);
 
 		WindowDraggerUpdate();
 
