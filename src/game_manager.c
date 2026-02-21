@@ -59,15 +59,15 @@ void GameManagerInit(GameManager *manager, const char *filePath)
         exit(1);
     }
 
-    manager->battleSheet = (PokemonBattleSpriteSheet *)malloc(sizeof(PokemonBattleSpriteSheet));
+    manager->battleSheet = (PkmnBattleSpriteSheet *)malloc(sizeof(PkmnBattleSpriteSheet));
     if (manager->battleSheet == NULL)
     {
-        TraceLog(LOG_ERROR, "Failed to allocate memory for PokemonBattleSpriteSheet.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for PkmnBattleSpriteSheet.\n");
         exit(1);
     }
 
     PkmnSpriteSheetLoad(manager->sheet, "pokedex.png");
-    BattleSpriteSheetInit(manager->battleSheet, "battle.png");
+    PkmnBattleSpriteSheetInit(manager->battleSheet, "battle.png");
     GameStateInit(manager->gameState, filePath);
 
     manager->pokeballAnim = NULL;
@@ -141,9 +141,9 @@ void GameManagerDraw(const GameManager *manager)
 
     if (manager->currentState != GAME_MANAGER_STATE_SPAWN_POKEMON && manager->spawnedPokemon != NULL)
     {
-        BattleSpriteSheetDrawPkmnName(
+        PkmnBattleSpriteSheetDrawPkmnName(
             manager->battleSheet, POKEMON_NAMES[manager->spawnedPokemon->pokemonId],
-            &manager->gameState->pokedex->registered[manager->spawnedPokemon->pokemonId],
+            &manager->gameState->pokedex->registered[manager->spawnedPokemon->pokemonId * 3],
             POKEMON_NAME_POSITION.x, POKEMON_NAME_POSITION.y);
     }
 
@@ -160,7 +160,7 @@ void GameManagerDraw(const GameManager *manager)
 
     if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH)
     {
-        BattleSpriteSheetPokeballDraw(
+        PkmnBattleSpriteSheetPokeballDraw(
             manager->battleSheet,
             manager->catchResult->pokeballType,
             POKEBALL_STATUS_IDLE,
@@ -173,13 +173,13 @@ void GameManagerDraw(const GameManager *manager)
 void GameManagerUnload(GameManager *manager)
 {
     GameStateSave(manager->gameState, "gamestate.dat");
-    GameStateFree(manager->gameState);
+    GameStateUnload(manager->gameState);
     free(manager->gameState);
 
     PkmnSpriteSheetUnload(manager->sheet);
     free(manager->sheet);
 
-    BattleSpriteSheetUnload(manager->battleSheet);
+    PkmnBattleSpriteSheetUnload(manager->battleSheet);
     free(manager->battleSheet);
 
     DialogBoxUnload(manager->bottomDialog);
@@ -220,6 +220,7 @@ static void SpawnRandomPokemon(GameManager *manager)
     }
 
     unsigned int pokemonId = GetRandomValue(0, POKEMON_COUNT - 1);
+    TraceLog(LOG_INFO, "Spawned pokemon %d, regular status %d, shiny status %d and bw status %d", pokemonId, manager->gameState->pokedex->registered[pokemonId * 3], manager->gameState->pokedex->registered[pokemonId * 3 + 1], manager->gameState->pokedex->registered[pokemonId * 3 + 2]);
     float variantRoll = (float)rand() / (float)RAND_MAX;
     unsigned short variant;
     if (variantRoll < PKMN_BW_PROBABILITY)
@@ -266,9 +267,7 @@ static void SpawnPokemonPhaseUpdate(GameManager *manager)
 static void RegisterCatchResultPhaseUpdate(GameManager *manager)
 {
     char msg[256];
-    TraceLog(LOG_INFO, "Catch successful, registering in pokedex and saving game state");
-    PokedexRegister(manager->gameState->pokedex, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
-    GameStateSave(manager->gameState, "gamestate.dat");
+    TraceLog(LOG_INFO, "Catch successful, registering %d with variant %d in pokedex", manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
 
     snprintf(msg, 256, "Gotcha! %s\nwas caught!      ", POKEMON_NAMES[manager->spawnedPokemon->pokemonId]);
     DialogBoxClearAndUpdateText(manager->bottomDialog, msg);
@@ -377,16 +376,7 @@ static void RollCatchResult(GameManager *manager)
 
     float catchRoll = (float)rand() / (float)RAND_MAX;
     catchRoll /= multiplier;
-    if (catchRoll < PKMN_CATCH_SUCCESS_PROBABILITY)
-    {
-        manager->catchResult->isSuccessful = 1;
-        PokedexRegister(manager->gameState->pokedex, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
-    }
-    else
-    {
-        manager->catchResult->isSuccessful = 0;
-    }
-
+    manager->catchResult->isSuccessful = catchRoll < PKMN_CATCH_SUCCESS_PROBABILITY;
     manager->catchResult->nShakes = manager->catchResult->isSuccessful ? 4 : GetRandomValue(0, 3);
 }
 
@@ -499,6 +489,8 @@ static void FinalizeCatchFailureState(GameManager *manager)
 
 static void FinalizePokedexRegisterState(GameManager *manager)
 {
+    PokedexRegister(manager->gameState->pokedex, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
+    GameStateSave(manager->gameState, "gamestate.dat");
 
     ClearContextForNextRound(manager, 1, 1);
     manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;

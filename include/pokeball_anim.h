@@ -23,7 +23,7 @@
 typedef struct
 {
     // Needed to render the animation
-    PokemonBattleSpriteSheet *sheet;
+    PkmnBattleSpriteSheet *sheet;
 
     // Animation parameters
     int pokeballType;
@@ -44,7 +44,7 @@ typedef struct
 
 void PokeballAnimInit(
     PokeballAnim *anim,
-    PokemonBattleSpriteSheet *sheet,
+    PkmnBattleSpriteSheet *sheet,
     Vector2 throwingStartPosition,
     Vector2 pokemonPosition,
     int pokeballType, int nShakes, int isSuccessfulCatch);

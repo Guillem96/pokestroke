@@ -28,7 +28,6 @@ void PkmnShrinkAnimUpdate(PkmnShrinkAnim *anim)
 
     int frames = anim->frameCounter - PKMN_SHRINK_FRAMES_OFFSET;
     anim->currentScale = 1 - ((float)frames / (float)PKMN_SHRINK_FRAMES);
-    TraceLog(LOG_INFO, "Frmes %d, Current scale %f\n", frames, anim->currentScale);
     anim->frameCounter++;
 }
 

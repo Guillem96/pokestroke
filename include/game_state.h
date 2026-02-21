@@ -21,6 +21,6 @@ void GameStateRecordKeyStroke(GameState *state);
 unsigned long long GameStateGetTotalKeyStrokes(const GameState *state);
 unsigned int GameStateGetNumDays(const GameState *state);
 void GameStateSave(const GameState *state, const char *filePath);
-void GameStateFree(GameState *state);
+void GameStateUnload(GameState *state);
 
 #endif // GAME_STATE_H

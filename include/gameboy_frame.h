@@ -5,6 +5,6 @@
 
 void GameBoyFrameInit();
 Rectangle GameBoyFrameDraw(int size);
-void GameBoyFrameFree();
+void GameBoyFrameUnload();
 
 #endif

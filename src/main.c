@@ -53,7 +53,7 @@ int main()
 		EndDrawing();
 	}
 
-	GameBoyFrameFree();
+	GameBoyFrameUnload();
 	GameManagerUnload(manager);
 	CloseWindow();
 	return 0;

@@ -1,8 +1,9 @@
 #include "pkmn_battle_sprite_sheet.h"
 #include <stdlib.h>
 #include "raylib.h"
+#include "pokedex.h"
 
-void BattleSpriteSheetInit(PokemonBattleSpriteSheet *sheet, const char *filename)
+void PkmnBattleSpriteSheetInit(PkmnBattleSpriteSheet *sheet, const char *filename)
 {
     TraceLog(LOG_INFO, "Loading Pokemon Battle Sprite Sheet: %s", filename);
     // Load image first to process alpha
@@ -54,7 +55,7 @@ void BattleSpriteSheetInit(PokemonBattleSpriteSheet *sheet, const char *filename
     }
 }
 
-void BattleSpriteSheetPokeballDraw(PokemonBattleSpriteSheet *sheet, unsigned short pokeballType, unsigned short status, int x, int y)
+void PkmnBattleSpriteSheetPokeballDraw(PkmnBattleSpriteSheet *sheet, unsigned short pokeballType, unsigned short status, int x, int y)
 {
     TraceLog(LOG_DEBUG, "Drawing pokeball type %d status %d at position (%d, %d)", pokeballType, status, x, y);
 
@@ -88,7 +89,7 @@ void BattleSpriteSheetPokeballDraw(PokemonBattleSpriteSheet *sheet, unsigned sho
     DrawTexturePro(sheet->texture, sourceRect, destRec, origin, 0.0f, WHITE);
 }
 
-void BattleSpriteSheetPokeballExplosionDraw(PokemonBattleSpriteSheet *sheet, unsigned short status, int x, int y)
+void PkmnBattleSpriteSheetPokeballExplosionDraw(PkmnBattleSpriteSheet *sheet, unsigned short status, int x, int y)
 {
     int xOffset = POKEBALL_EXPLOSION_SHEET_OFFSET_X + ((status % POKEBALL_EXPLOSION_COLS) * (POKEBALL_EXPLOSION_WIDTH + POKEBALL_EXPLOSION_MARGIN));
     int yOffset = POKEBALL_EXPLOSION_SHEET_OFFSET_Y + ((status / POKEBALL_EXPLOSION_COLS) * (POKEBALL_EXPLOSION_HEIGHT + POKEBALL_EXPLOSION_MARGIN));
@@ -103,7 +104,7 @@ void BattleSpriteSheetPokeballExplosionDraw(PokemonBattleSpriteSheet *sheet, uns
     DrawTexturePro(sheet->texture, sourceRect, destRec, origin, 0.0f, WHITE);
 }
 
-void BattleSpriteSheetDrawPkmnName(PokemonBattleSpriteSheet *sheet, const char *name, unsigned short *isCaught, int x, int y)
+void PkmnBattleSpriteSheetDrawPkmnName(PkmnBattleSpriteSheet *sheet, const char *name, unsigned short *isCaught, int x, int y)
 {
     Rectangle sourceRect = {
         PKMN_NAME_BAR_OFFSET_X,
@@ -131,7 +132,7 @@ void BattleSpriteSheetDrawPkmnName(PokemonBattleSpriteSheet *sheet, const char *
     for (int i = 0; i < 3; i++)
     {
         destRec = (Rectangle){indicatorX + (i * PKMN_INDICATOR_SIZE), y, PKMN_INDICATOR_SIZE, PKMN_INDICATOR_SIZE};
-        if (isCaught[i])
+        if (isCaught[i] == POKEDEX_REGISTERED)
         {
             DrawTexturePro(sheet->texture, caughtIndicatorSourceRect, destRec, origin, 0.0f, WHITE);
         }
@@ -141,7 +142,7 @@ void BattleSpriteSheetDrawPkmnName(PokemonBattleSpriteSheet *sheet, const char *
         }
     }
 }
-void BattleSpriteSheetUnload(PokemonBattleSpriteSheet *sheet)
+void PkmnBattleSpriteSheetUnload(PkmnBattleSpriteSheet *sheet)
 {
     UnloadTexture(sheet->texture);
 }

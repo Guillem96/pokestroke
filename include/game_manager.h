@@ -52,7 +52,7 @@ typedef struct
 {
     GameState *gameState;
     PokemonSpriteSheet *sheet;
-    PokemonBattleSpriteSheet *battleSheet;
+    PkmnBattleSpriteSheet *battleSheet;
 
     // Animations
     PokeballAnim *pokeballAnim;

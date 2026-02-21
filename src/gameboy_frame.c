@@ -89,7 +89,7 @@ Rectangle GameBoyFrameDraw(int size)
     return (Rectangle){screenX, screenY, screenWidth, screenHeight};
 }
 
-void GameBoyFrameFree()
+void GameBoyFrameUnload()
 {
     UnloadFont(nintendoFont);
     UnloadFont(gameBoyFont);

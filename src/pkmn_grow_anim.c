@@ -24,7 +24,6 @@ void PkmnGrowAnimUpdate(PkmnGrowAnim *anim)
     }
 
     anim->currentScale = (float)anim->frameCounter / (float)PKMN_GROW_FRAMES;
-    TraceLog(LOG_INFO, "Growth animation scale: %f\n", anim->currentScale);
     anim->frameCounter++;
 }
 

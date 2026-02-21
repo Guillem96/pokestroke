@@ -14,7 +14,7 @@ static void ShakePokeballEveryN(PokeballAnim *anim, int frame, int nFrames);
 static Vector2 QuadraticBezier(Vector2 p0, Vector2 p1, Vector2 p2, float t);
 
 void PokeballAnimInit(
-    PokeballAnim *anim, PokemonBattleSpriteSheet *sheet,
+    PokeballAnim *anim, PkmnBattleSpriteSheet *sheet,
     Vector2 throwingStartPosition,
     Vector2 pokemonPosition,
     int pokeballType, int nShakes, int isSuccessfulCatch)
@@ -67,23 +67,23 @@ void PokeballAnimDraw(PokeballAnim *anim)
 {
     if (anim->status == POKEBALL_ANIM_STATUS_BREAK_FREE)
     {
-        BattleSpriteSheetPokeballExplosionDraw(anim->sheet, anim->explosionStatus, anim->pokemonPosition.x - POKEBALL_EXPLOSION_REAL_SIZE / 2, anim->pokemonPosition.y - POKEBALL_EXPLOSION_REAL_SIZE / 2);
+        PkmnBattleSpriteSheetPokeballExplosionDraw(anim->sheet, anim->explosionStatus, anim->pokemonPosition.x - POKEBALL_EXPLOSION_REAL_SIZE / 2, anim->pokemonPosition.y - POKEBALL_EXPLOSION_REAL_SIZE / 2);
         return;
     }
 
     if (anim->status == POKEBALL_ANIM_STATUS_OPENING || anim->status == POKEBALL_ANIM_STATUS_CLOSING || anim->status == POKEBALL_ANIM_STATUS_EXPLODING)
     {
-        BattleSpriteSheetPokeballDraw(anim->sheet, anim->pokeballType, POKEBALL_STATUS_HALF_DOWN, anim->pokemonPosition.x - POKEBALL_SIZE / 2, anim->pokemonPosition.y - POKEBALL_SIZE / 4);
-        BattleSpriteSheetPokeballDraw(anim->sheet, anim->pokeballType, POKEBALL_STATUS_HALF_UP, anim->position.x - POKEBALL_SIZE / 2, anim->position.y - POKEBALL_SIZE / 2);
+        PkmnBattleSpriteSheetPokeballDraw(anim->sheet, anim->pokeballType, POKEBALL_STATUS_HALF_DOWN, anim->pokemonPosition.x - POKEBALL_SIZE / 2, anim->pokemonPosition.y - POKEBALL_SIZE / 4);
+        PkmnBattleSpriteSheetPokeballDraw(anim->sheet, anim->pokeballType, POKEBALL_STATUS_HALF_UP, anim->position.x - POKEBALL_SIZE / 2, anim->position.y - POKEBALL_SIZE / 2);
     }
     else
     {
-        BattleSpriteSheetPokeballDraw(anim->sheet, anim->pokeballType, anim->pokeballStatus, anim->position.x - POKEBALL_SIZE / 2, anim->position.y - POKEBALL_SIZE);
+        PkmnBattleSpriteSheetPokeballDraw(anim->sheet, anim->pokeballType, anim->pokeballStatus, anim->position.x - POKEBALL_SIZE / 2, anim->position.y - POKEBALL_SIZE);
     }
 
     if (anim->status == POKEBALL_ANIM_STATUS_EXPLODING)
     {
-        BattleSpriteSheetPokeballExplosionDraw(anim->sheet, anim->explosionStatus, anim->pokemonPosition.x - POKEBALL_EXPLOSION_REAL_SIZE / 2, anim->pokemonPosition.y - POKEBALL_EXPLOSION_REAL_SIZE / 2);
+        PkmnBattleSpriteSheetPokeballExplosionDraw(anim->sheet, anim->explosionStatus, anim->pokemonPosition.x - POKEBALL_EXPLOSION_REAL_SIZE / 2, anim->pokemonPosition.y - POKEBALL_EXPLOSION_REAL_SIZE / 2);
     }
 }
 
@@ -125,7 +125,6 @@ static void PlayClosingAnimation(PokeballAnim *anim)
 
 static void PlayShakingAnimation(PokeballAnim *anim)
 {
-    TraceLog(LOG_INFO, "Playing shaking animation, frameCounter: %d, nShakes: %d pokeball status: %d", anim->frameCounter, anim->nShakes, anim->pokeballStatus);
     if (anim->frameCounter > POKEBALL_ANIM_SHAKE_FRAME)
     {
         // End of the animation
@@ -162,7 +161,6 @@ static void PlayThrowingAnimation(PokeballAnim *anim)
 
     anim->frameCounter++;
     float t = (float)anim->frameCounter / POKEBALL_ANIM_THORW_FRAMES;
-    TraceLog(LOG_INFO, "Playing throwing animation, frameCounter: %d, t: %f", anim->frameCounter, t);
     anim->position = QuadraticBezier(
         anim->throwingStartPosition,
         (Vector2){

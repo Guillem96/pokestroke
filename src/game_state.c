@@ -99,7 +99,7 @@ void GameStateSave(const GameState *state, const char *filePath)
     fclose(file);
 }
 
-void GameStateFree(GameState *state)
+void GameStateUnload(GameState *state)
 {
     LogGameState(state);
     free(state->keyStrokesByDay);
