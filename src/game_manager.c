@@ -95,9 +95,15 @@ void GameManagerUpdate(GameManager *manager)
     GameStateRecordKeyStroke(manager->gameState);
 
     DialogBoxUpdate(manager->bottomDialog);
+    if (manager->currentState == GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT && manager->bottomDialog->isComplete)
+    {
+        manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
+        ClearContextForNextRound(manager, 1, 1);
+    }
     if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH && manager->bottomDialog->isComplete)
     {
         FinalizePokedexRegisterState(manager);
+        DialogBoxClearAndUpdateText(manager->bottomDialog, "      ");
     }
     else if (manager->currentState == GAME_MANAGER_STATE_CATCH_FAILURE && manager->bottomDialog->isComplete)
     {
@@ -107,7 +113,7 @@ void GameManagerUpdate(GameManager *manager)
     {
         FinalizePokemonFleeState(manager);
     }
-    else if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH || manager->currentState == GAME_MANAGER_STATE_POKEMON_FLEEING)
+    else if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH || manager->currentState == GAME_MANAGER_STATE_POKEMON_FLEEING || manager->currentState == GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT)
     {
         // Waiting for dialog to complete, do not update anything else
         return;
@@ -158,7 +164,7 @@ void GameManagerDraw(const GameManager *manager)
         PkmnGrowAnimDraw(manager->growAnim);
     }
 
-    if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH)
+    if (manager->currentState == GAME_MANAGER_STATE_REGISTERING_CATCH || manager->currentState == GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT)
     {
         PkmnBattleSpriteSheetPokeballDraw(
             manager->battleSheet,
@@ -491,9 +497,7 @@ static void FinalizePokedexRegisterState(GameManager *manager)
 {
     PokedexRegister(manager->gameState->pokedex, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
     GameStateSave(manager->gameState, "gamestate.dat");
-
-    ClearContextForNextRound(manager, 1, 1);
-    manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
+    manager->currentState = GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT;
 }
 
 static void FinalizePokemonFleeState(GameManager *manager)

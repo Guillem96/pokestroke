@@ -45,7 +45,7 @@ void GameStateRecordKeyStroke(GameState *state)
     unsigned long long *newArray = realloc(state->keyStrokesByDay, sizeof(unsigned long long) * newCapacity);
     if (newArray == NULL)
     {
-        fprintf(stderr, "Error reallocating memory for keyStrokesByDay\n");
+        TraceLog(LOG_ERROR, "Error reallocating memory for keyStrokesByDay\n");
         exit(1);
     }
     for (unsigned int i = state->currentCapacity; i < newCapacity; i++)
@@ -87,7 +87,7 @@ void GameStateSave(const GameState *state, const char *filePath)
     FILE *file = fopen(filePath, "wb");
     if (file == NULL)
     {
-        fprintf(stderr, "Error opening file for writing: %s\n", filePath);
+        TraceLog(LOG_ERROR, "Error opening file for writing: %s\n", filePath);
         return;
     }
 

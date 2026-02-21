@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "raylib.h"
 
 const char *POKEMON_NAMES[] = {
     "BULBASAUR",
@@ -262,7 +263,7 @@ void PokedexInit(Pokedex *pokedex)
     pokedex->registered = (unsigned short *)malloc(POKEMON_COUNT * VARIANT_COUNT * sizeof(unsigned short));
     if (pokedex->registered == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for Pokedex.\n");
+        TraceLog(LOG_ERROR, "Failed to allocate memory for Pokedex.\n");
         exit(1);
     }
     for (unsigned int i = 0; i < POKEMON_COUNT * VARIANT_COUNT; i++)
