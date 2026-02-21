@@ -66,14 +66,18 @@ Good luck. You’ll need it.
 
 ## 🖼️ Screenshots
 
-> _Coming soon_
+Get excited while working!
+
+| <img src="/img/screenshot1.png" width="200" /> | <img src="/img/screenshot2.png" width="200" /> | <img src="/img/screenshot3.png" width="200" /> |
+| ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| <img src="/img/screenshot4.png" width="200" /> | <img src="/img/screenshot5.png" width="200" /> | <img src="/img/screenshot6.png" width="200" /> |
 
 ## 🗺️ Roadmap
 
 Planned improvements and features:
 
-- [ ] Move window with `Cmd + Mouse drag` like Control
-- [ ] Force window not to minimize (true overlay mode)
+- [x] Move window with `Cmd + Mouse drag` like Control
+- [x] Force window not to minimize (true overlay mode)
 - [ ] Pokédex (caught, seen, missing)
 - [ ] Render number of keystrokes pressed
 
