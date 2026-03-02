@@ -7,10 +7,11 @@
 #include "pokeball_anim.h"
 #include "pkmn_spawn_anim.h"
 #include "dialog_box.h"
+#include "pokedex_gui.h"
 #include "pkmn_shrink_anim.h"
 #include "pkmn_grow_anim.h"
 
-#define POKEMON_POSITION (Vector2){135, 95}
+#define POKEMON_POSITION (Vector2){145, 90}
 #define POKEBALL_THROW_START_POSITION (Vector2){60, 180}
 #define POKEMON_NAME_POSITION (Vector2){60, 75}
 
@@ -35,6 +36,7 @@
 #define GAME_MANAGER_STATE_CATCH_FAILURE 3
 #define GAME_MANAGER_STATE_POKEMON_FLEEING 4
 #define GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT 5
+#define GAME_MANAGER_STATE_SHOW_POKEDEX 6
 
 typedef struct
 {
@@ -52,6 +54,11 @@ typedef struct
 typedef struct
 {
     GameState *gameState;
+
+    // Extra GUIs
+    PokedexGUI *pokedexGUI;
+
+    // Sprite sheets
     PokemonSpriteSheet *sheet;
     PkmnBattleSpriteSheet *battleSheet;
 
@@ -63,12 +70,13 @@ typedef struct
 
     // Dialog boxes
     DialogBox *bottomDialog;
+    DialogBox *numKsDialog;
 
     // State
     SpawnedPokemon *spawnedPokemon;
     PokemonCatchResult *catchResult;
     unsigned short currentState;
-
+    unsigned short prevStateBeforePokedex;
 } GameManager;
 
 void GameManagerInit(GameManager *manager, const char *filePath);

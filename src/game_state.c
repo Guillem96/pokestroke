@@ -30,7 +30,6 @@ void GameStateRecordKeyStroke(GameState *state)
     time_t now = time(NULL);
     double secondsSinceStart = difftime(now, state->startTime);
     unsigned int dayIndex = (unsigned int)(secondsSinceStart / SECOND_IN_DAY);
-
     if (dayIndex < state->currentCapacity)
     {
         state->keyStrokesByDay[dayIndex]++;
@@ -63,9 +62,12 @@ unsigned long long GameStateGetTotalKeyStrokes(const GameState *state)
     {
         if (state->keyStrokesByDay[i] == NO_DAY_DATA)
         {
-            return total;
+            total += 0;
         }
-        total += state->keyStrokesByDay[i];
+        else
+        {
+            total += state->keyStrokesByDay[i];
+        }
     }
     return total;
 }

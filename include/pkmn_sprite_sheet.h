@@ -22,9 +22,9 @@ typedef struct
     Texture2D texture;
 } PokemonSpriteSheet;
 
-void PkmnSpriteSheetLoad(PokemonSpriteSheet *sheet, const char *filename);
+void PkmnSpriteSheetInit(PokemonSpriteSheet *sheet, const char *filename);
 void PkmnSpriteSheetDraw(PokemonSpriteSheet *sheet, int pokemon, unsigned short variant, Vector2 pos);
-void PkmnSpriteSheetDrawScale(PokemonSpriteSheet *sheet, int pokemon, unsigned short variant, Vector2 pos, float scale);
+void PkmnSpriteSheetDrawPro(PokemonSpriteSheet *sheet, int pokemon, unsigned short variant, Vector2 pos, float scale, bool anchorToBottomCenter, Color tint);
 void PkmnSpriteSheetUnload(PokemonSpriteSheet *sheet);
 
 #endif // POKEMON_SPRITE_SHEET_H

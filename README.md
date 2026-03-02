@@ -72,14 +72,22 @@ Get excited while working!
 | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
 | <img src="/img/screenshot4.png" width="200" /> | <img src="/img/screenshot5.png" width="200" /> | <img src="/img/screenshot6.png" width="200" /> |
 
+## Gotta type 'em all (PokeDex)
+
+Focus the window and press `P` to open the PokeDex.
+
+![Pokedex](/img/pokedex_1.png)
+
 ## 🗺️ Roadmap
 
 Planned improvements and features:
 
 - [x] Move window with `Cmd + Mouse drag` like Control
 - [x] Force window not to minimize (true overlay mode)
-- [ ] Pokédex (caught, seen, missing)
-- [ ] Render number of keystrokes pressed
+- [x] Pokédex (caught, seen, missing)
+- [x] Render number of keystrokes pressed
+- [ ] MacOS & Windows installer
+- [ ] CI/CD to build and release the installer
 
 ## 🛠️ Built With
 

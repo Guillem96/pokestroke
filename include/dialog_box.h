@@ -11,9 +11,10 @@ typedef struct
     float frameCounter;
     unsigned short isComplete;
     Rectangle bounds;
+    bool alignTextRight;
 } DialogBox;
 
-void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds);
+void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds, bool alignTextRight);
 void DialogBoxClearAndUpdateText(DialogBox *box, const char *text);
 void DialogBoxUpdate(DialogBox *box);
 void DialogBoxDraw(const DialogBox *box);

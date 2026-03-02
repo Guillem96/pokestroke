@@ -119,6 +119,11 @@ void PkmnBattleSpriteSheetDrawPkmnName(PkmnBattleSpriteSheet *sheet, const char 
     DrawText(name, x + PKMN_NAME_OFFSET_X, y, 10, BLACK);
 
     float indicatorX = x + PKMN_NAME_OFFSET_X + textWidth + 4;
+    PkmnBattleSpriteSheeDrawCaughtIndicator(sheet, isCaught, (Vector2){indicatorX, y}, 1.0f);
+}
+
+void PkmnBattleSpriteSheeDrawCaughtIndicator(PkmnBattleSpriteSheet *sheet, unsigned short *isCaught, Vector2 pos, float scale)
+{
     Rectangle caughtIndicatorSourceRect = {
         PKMN_CAUGHT_INDIDATOR_OFFSET_X,
         PKMN_CAUGHT_INDIDATOR_OFFSET_Y,
@@ -129,23 +134,25 @@ void PkmnBattleSpriteSheetDrawPkmnName(PkmnBattleSpriteSheet *sheet, const char 
         PKMN_NON_CAUGHT_INDIDATOR_OFFSET_Y,
         PKMN_INDICATOR_SIZE - 1, PKMN_INDICATOR_SIZE - 1};
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < VARIANT_COUNT; i++)
     {
         bool isRegistered = isCaught[i] == POKEDEX_REGISTERED;
-        destRec = (Rectangle){
-            indicatorX + (i * (PKMN_INDICATOR_SIZE + 2)),
-            y + !isRegistered * 0.5,
-            PKMN_INDICATOR_SIZE - !isRegistered, PKMN_INDICATOR_SIZE - !isRegistered};
+        Rectangle destRec = (Rectangle){
+            pos.x + (i * ((PKMN_INDICATOR_SIZE + 2) * scale)),
+            pos.y + !isRegistered * 0.5,
+            (PKMN_INDICATOR_SIZE - !isRegistered) * scale,
+            (PKMN_INDICATOR_SIZE - !isRegistered) * scale};
         if (isRegistered)
         {
-            DrawTexturePro(sheet->texture, caughtIndicatorSourceRect, destRec, origin, 0.0f, WHITE);
+            DrawTexturePro(sheet->texture, caughtIndicatorSourceRect, destRec, (Vector2){0, 0}, 0.0f, WHITE);
         }
         else
         {
-            DrawTexturePro(sheet->texture, notCaughtIndicatorSourceRect, destRec, origin, 0.0f, WHITE);
+            DrawTexturePro(sheet->texture, notCaughtIndicatorSourceRect, destRec, (Vector2){0, 0}, 0.0f, WHITE);
         }
     }
 }
+
 void PkmnBattleSpriteSheetUnload(PkmnBattleSpriteSheet *sheet)
 {
     UnloadTexture(sheet->texture);

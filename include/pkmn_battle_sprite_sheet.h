@@ -60,6 +60,8 @@ void PkmnBattleSpriteSheetPokeballExplosionDraw(
     PkmnBattleSpriteSheet *sheet, unsigned short status, int x, int y);
 void PkmnBattleSpriteSheetDrawPkmnName(
     PkmnBattleSpriteSheet *sheet, const char *name, unsigned short *isCaught, int x, int y);
+void PkmnBattleSpriteSheeDrawCaughtIndicator(
+    PkmnBattleSpriteSheet *sheet, unsigned short *isCaught, Vector2 pos, float scale);
 void PkmnBattleSpriteSheetUnload(PkmnBattleSpriteSheet *sheet);
 
 #endif // PKMN_BATTLE_SPRITE_SHEET_H

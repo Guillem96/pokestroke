@@ -29,5 +29,5 @@ void PkmnGrowAnimUpdate(PkmnGrowAnim *anim)
 
 void PkmnGrowAnimDraw(PkmnGrowAnim *anim)
 {
-    PkmnSpriteSheetDrawScale(anim->sheet, anim->pokemon, anim->variant, anim->pkmnPosition, anim->currentScale);
+    PkmnSpriteSheetDrawPro(anim->sheet, anim->pokemon, anim->variant, anim->pkmnPosition, anim->currentScale, true, WHITE);
 }

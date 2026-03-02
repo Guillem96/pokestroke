@@ -86,6 +86,15 @@ Rectangle GameBoyFrameDraw(int size)
         0.5f,
         (Color){28, 47, 119, 255});
 
+    // Controls
+    DrawTextEx(
+        nintendoFont,
+        "ESC to exit  .  P open PokeDex",
+        (Vector2){60, 10},
+        (float)fontSize * 0.8f,
+        0.5f,
+        DARKGRAY);
+
     return (Rectangle){screenX, screenY, screenWidth, screenHeight};
 }
 

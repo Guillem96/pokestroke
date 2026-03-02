@@ -33,5 +33,5 @@ void PkmnShrinkAnimUpdate(PkmnShrinkAnim *anim)
 
 void PkmnShrinkAnimDraw(PkmnShrinkAnim *anim)
 {
-    PkmnSpriteSheetDrawScale(anim->sheet, anim->pokemon, anim->variant, anim->pkmnPosition, anim->currentScale);
+    PkmnSpriteSheetDrawPro(anim->sheet, anim->pokemon, anim->variant, anim->pkmnPosition, anim->currentScale, true, WHITE);
 }

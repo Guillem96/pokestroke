@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds)
+void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds, bool alignTextRight)
 {
-
     strcpy(box->text, text);
     box->currentCharIndex = 0;
     box->totalChars = strlen(text);
+    box->alignTextRight = alignTextRight;
     box->framesPerChar = framesPerChar;
     box->bounds = bounds;
     box->frameCounter = 0;
@@ -52,7 +52,14 @@ void DialogBoxDraw(const DialogBox *box)
 
     DrawRectangleRounded((Rectangle){box->bounds.x - 2, box->bounds.y - 2, box->bounds.width + 4, box->bounds.height + 4}, 0.1f, 8, WHITE);
     DrawRectangleRoundedLinesEx(box->bounds, 0.1f, 8, 2, BLACK);
-    DrawText(ss, box->bounds.x + 8, box->bounds.y + 8, 13, BLACK);
+
+    if (box->alignTextRight)
+    {
+        int textSize = MeasureText(ss, 13);
+        DrawText(ss, box->bounds.x + box->bounds.width - textSize - 8, box->bounds.y + 4, 13, BLACK);
+        return;
+    }
+    DrawText(ss, box->bounds.x + 8, box->bounds.y + 4, 13, BLACK);
 }
 
 void DialogBoxUnload(DialogBox *box)
