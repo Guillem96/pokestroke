@@ -21,7 +21,7 @@ PokeStroke is a **keystroke-driven Pokémon catching game** designed to run as a
 
 You don’t stop working to play — **working _is_ playing**.
 
-![](img/game2.png)
+<img src="img/game2.png" width="300" />
 
 ## 🎮 How the Game Works
 
@@ -64,6 +64,12 @@ Completing your collection means capturing **every Pokémon, in every variant** 
 
 Good luck. You’ll need it.
 
+## Gotta type 'em all (PokeDex)
+
+Focus the window and press `P` to open the PokeDex.
+
+<img src="img/pokedex_1.png" width="300" />
+
 ## 🖼️ Screenshots
 
 Get excited while working!
@@ -71,12 +77,6 @@ Get excited while working!
 | <img src="/img/screenshot1.png" width="200" /> | <img src="/img/screenshot2.png" width="200" /> | <img src="/img/screenshot3.png" width="200" /> |
 | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
 | <img src="/img/screenshot4.png" width="200" /> | <img src="/img/screenshot5.png" width="200" /> | <img src="/img/screenshot6.png" width="200" /> |
-
-## Gotta type 'em all (PokeDex)
-
-Focus the window and press `P` to open the PokeDex.
-
-![Pokedex](/img/pokedex_1.png)
 
 ## 🗺️ Roadmap
 
