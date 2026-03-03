@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "windows_fix.h"
 #include "raylib.h"
 #include "bg_input.h"
 #include "resource_dir.h"
