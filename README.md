@@ -1,5 +1,7 @@
 # PokéStroke
 
+![ai-logo](/img/logo.png)
+
 **Catch Pokémon while you work. Every keystroke matters.**
 
 Keydex is a lightweight desktop **overlay game** that lives on top of whatever you’re doing.  
@@ -69,6 +71,41 @@ Good luck. You’ll need it.
 Focus the window and press `P` to open the PokeDex.
 
 <img src="img/pokedex_1.png" width="300" />
+
+## 🚀 Installation
+
+You can install Pokestroke instantly using the terminal. This will download the latest release for your platform and set up the required resources in $HOME/.pokestroke.
+
+### macOS (Apple Silicon)
+
+Open your terminal and run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Guillem96/pokestroke/main/install.sh | bash
+```
+
+### Windows
+
+Open PowerShell as an Administrator and run:
+
+```bash
+iwr -useb https://raw.githubusercontent.com/Guillem96/pokestroke/main/install.ps1 | iex
+```
+
+### 📂 Directory Structure
+
+After installation, your files will be organized as follows:
+
+- Application/Binary: Installed to `~/.pokestroke/`
+- Resources: Extracted to `~/.pokestroke/resources/`
+
+### Manual Installation
+
+If you prefer not to use the automated scripts:
+
+- Navigate to the Releases page.
+- Download the .zip specific to your OS and the resources.zip.
+- Extract both into a folder named `.pokestroke` in your User/Home directory.
 
 ## 🖼️ Screenshots
 

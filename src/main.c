@@ -81,7 +81,7 @@ static void SetupGameFilesystem(void)
 	const char *home = GetUserHomeDir();
 	if (home != NULL)
 	{
-		const char *savePath = TextFormat("%s/.pokestroke", home);
+		const char *savePath = TextFormat("%s/.pokestroke/resources", home);
 
 		if (!DirectoryExists(savePath))
 		{

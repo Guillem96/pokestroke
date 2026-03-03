@@ -2,13 +2,8 @@
 #include "raylib.h"
 
 #ifdef _WIN32
-#define NOGDI
-#define NOUSER
 
 #include <windows.h>
-
-#undef near
-#undef far
 
 static bool keyState[256] = {0};
 
