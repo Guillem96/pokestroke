@@ -42,6 +42,7 @@ static void CatchFailurePhaseUpdate(GameManager *manager);
 // Helpers
 static void ClearContextForNextRound(GameManager *manager, unsigned short clearSpawnedPokemon, unsigned short clearCatchResult);
 static void CheckForPokedexOpen(GameManager *manager);
+static const char *FormatNumber(unsigned long long n);
 
 void GameManagerInit(GameManager *manager, const char *filePath)
 {
@@ -118,7 +119,8 @@ void GameManagerUpdate(GameManager *manager)
     }
     // Record keystrokes
     GameStateRecordKeyStroke(manager->gameState);
-    DialogBoxClearAndUpdateText(manager->numKsDialog, TextFormat("%dks.", GameStateGetTotalKeyStrokes(manager->gameState)));
+    DialogBoxClearAndUpdateText(manager->numKsDialog,
+                                TextFormat("%sks.", FormatNumber(GameStateGetTotalKeyStrokes(manager->gameState))));
     manager->numKsDialog->currentCharIndex = strlen(manager->numKsDialog->text);
 
     DialogBoxUpdate(manager->bottomDialog);
@@ -557,4 +559,35 @@ static void CheckForPokedexOpen(GameManager *manager)
         manager->prevStateBeforePokedex = manager->currentState;
         manager->currentState = GAME_MANAGER_STATE_SHOW_POKEDEX;
     }
+}
+
+static const char *FormatNumber(unsigned long long n)
+{
+    static char buffer[32];
+    char temp[32];
+    int res = sprintf(temp, "%llu", n);
+
+    int count = 0;
+    int dest = 0;
+
+    for (int i = res - 1; i >= 0; i--)
+    {
+        if (count > 0 && count % 3 == 0)
+        {
+            buffer[dest++] = '.';
+        }
+        buffer[dest++] = temp[i];
+        count++;
+    }
+    buffer[dest] = '\0';
+
+    // Reverse the string back
+    for (int i = 0; i < dest / 2; i++)
+    {
+        char t = buffer[i];
+        buffer[i] = buffer[dest - i - 1];
+        buffer[dest - i - 1] = t;
+    }
+
+    return buffer;
 }

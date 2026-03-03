@@ -88,6 +88,7 @@ Planned improvements and features:
 - [x] Render number of keystrokes pressed
 - [ ] MacOS & Windows installer
 - [ ] CI/CD to build and release the installer
+- [ ] Use Mono font
 
 ## 🛠️ Built With
 

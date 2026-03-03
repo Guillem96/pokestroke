@@ -32,8 +32,8 @@ void PkmnSpriteSheetDrawPro(PokemonSpriteSheet *sheet, int pokemon, unsigned sho
 
     int newWidth = PKMN_WIDTH * scale;
     int newHeight = PKMN_HEIGHT * scale;
-    float x = pos.x;
-    float y = pos.y;
+    int x = pos.x;
+    int y = pos.y;
     if (anchorToBottomCenter)
     {
         x += (float)(PKMN_WIDTH - newWidth) / 2.f;
