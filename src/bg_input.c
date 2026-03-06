@@ -3,6 +3,7 @@
 
 #ifdef _WIN32
 
+#include "windows_fix.h"
 #include <windows.h>
 
 static bool keyState[256] = {0};
