@@ -69,6 +69,7 @@ jobs:
           cp -r windows-bin/* windows-dist/
           cd windows-dist
           zip -r pokestroke-windows.zip .
+          mv pokestroke-windows.zip ../
 
       - name: Package MacOS
         run: |
@@ -76,6 +77,7 @@ jobs:
           cp -r macos-bin/* macos-dist/
           cd macos-dist
           zip -r pokestroke-macos.zip .
+          mv pokestroke-macos.zip ../
 
       - name: Release
         uses: softprops/action-gh-release@v2
