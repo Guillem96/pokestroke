@@ -67,13 +67,15 @@ jobs:
         run: |
           mkdir windows-dist
           cp -r windows-bin/* windows-dist/
-          zip -r pokestroke-windows.zip windows-dist/
+          cd windows-dist
+          zip -r pokestroke-windows.zip .
 
       - name: Package MacOS
         run: |
           mkdir macos-dist
           cp -r macos-bin/* macos-dist/
-          zip -r pokestroke-macos.zip macos-dist/
+          cd macos-dist
+          zip -r pokestroke-macos.zip .
 
       - name: Release
         uses: softprops/action-gh-release@v2

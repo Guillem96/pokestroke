@@ -36,17 +36,17 @@ int main()
 	while (!WindowShouldClose())
 	{
 		int key = GetBackgroundAnyKeyPressed();
-		if (key == 53)
-		{
-			TraceLog(LOG_INFO, "ESC pressed, quitting game", key);
-			break;
-		}
 
 		if (key != -1)
 		{
 			GameManagerUpdate(manager);
 		}
 
+		if (GetKeyPressed() == KEY_ESCAPE)
+		{
+			TraceLog(LOG_INFO, "ESC pressed, quitting game", key);
+			break;
+		}
 		WindowDraggerUpdate();
 
 		BeginDrawing();
