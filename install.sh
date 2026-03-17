@@ -3,7 +3,7 @@
 # Configuration
 REPO="Guillem96/pokestroke"
 INSTALL_DIR="$HOME/.pokestroke"
-BIN_NAME="pokestroke" # Ensure this matches your actual binary name
+BIN_NAME="pokestroke" 
 
 echo "🚀 Installing Pokestroke..."
 
@@ -12,11 +12,11 @@ OS_TYPE=$(uname -s)
 if [ "$OS_TYPE" == "Darwin" ]; then
     PACKAGE="pokestroke-macos.zip"
     IS_MAC=true
-elif [[ "$OS_TYPE" == "MINGW"* || "$OS_TYPE" == "MSYS"* || "$OS_TYPE" == "Linux" ]]; then
-    PACKAGE="pokestroke-windows.zip" # Assuming Linux users use the windows-dist or similar logic
+elif [[ "$OS_TYPE" == "Linux" ]]; then
+    PACKAGE="pokestroke-linux.zip"
     IS_MAC=false
 else
-    echo "❌ Unsupported OS."
+    echo "❌ Unsupported OS: $OS_TYPE"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ RES_URL=$(echo "$RELEASE_DATA" | grep "browser_download_url.*resources.zip" | cu
 
 # 3. Setup Directory
 mkdir -p "$INSTALL_DIR"
-cd /tmp
+cd /tmp || exit
 
 # 4. Download and Extract
 echo "📦 Downloading assets..."
@@ -42,37 +42,42 @@ chmod +x "$INSTALL_DIR/$BIN_NAME"
 
 # --- NEW SECTION: INTERACTIVE SETUP ---
 
+# We use < /dev/tty to force bash to listen to the keyboard even if piped
 echo ""
-read -p "❓ Do you want to create a desktop shortcut? (y/n): " confirm_shortcut
-if [[ $confirm_shortcut == [yY] || $confirm_shortcut == [yY][eE][sS] ]]; then
+read -p "❓ Do you want to create a desktop shortcut? (y/n): " confirm_shortcut < /dev/tty
+
+if [[ $confirm_shortcut =~ ^[yY](es)?$ ]]; then
     if [ "$IS_MAC" = true ]; then
-        # Create a macOS .app wrapper or a simple alias
-        ln -s "$INSTALL_DIR/$BIN_NAME" "$HOME/Desktop/Pokestroke"
-        echo "✅ Alias created on Desktop."
+        SHORTCUT_PATH="$HOME/Desktop/Pokestroke.app"
+        # Create a small AppleScript app that runs the binary silently
+        osacompile -o "$SHORTCUT_PATH" -e "do shell script \"$INSTALL_DIR/$BIN_NAME > /dev/null 2>&1 &\""
+        echo "✅ macOS App Shortcut created on Desktop (No Terminal)."
     else
-        # Create a Linux .desktop file
         DESKTOP_FILE="$HOME/Desktop/pokestroke.desktop"
-        echo "[Desktop Entry]
+        cat <<EOF > "$DESKTOP_FILE"
+[Desktop Entry]
 Type=Application
 Name=Pokestroke
 Exec=$INSTALL_DIR/$BIN_NAME
 Path=$INSTALL_DIR
 Icon=$INSTALL_DIR/resources/icon.png
-Terminal=false" > "$DESKTOP_FILE"
+Terminal=false
+EOF
         chmod +x "$DESKTOP_FILE"
         echo "✅ Desktop shortcut created."
     fi
 fi
 
 echo ""
-read -p "❓ Do you want Pokestroke to run automatically on session start? (y/n): " confirm_auto
-if [[ $confirm_auto == [yY] || $confirm_auto == [yY][eE][sS] ]]; then
+read -p "❓ Do you want Pokestroke to run automatically on session start? (y/n): " confirm_auto < /dev/tty
+
+if [[ $confirm_auto =~ ^[yY](es)?$ ]]; then
     if [ "$IS_MAC" = true ]; then
-        # macOS LaunchAgent
         PLIST="$HOME/Library/LaunchAgents/com.guillem96.pokestroke.plist"
-        echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+        cat <<EOF > "$PLIST"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
 <dict>
     <key>Label</key>
     <string>com.guillem96.pokestroke</string>
@@ -83,19 +88,20 @@ if [[ $confirm_auto == [yY] || $confirm_auto == [yY][eE][sS] ]]; then
     <key>RunAtLoad</key>
     <true/>
 </dict>
-</plist>" > "$PLIST"
+</plist>
+EOF
         launchctl load "$PLIST"
         echo "✅ LaunchAgent created and loaded."
     else
-        # Linux Autostart
         AUTOSTART_DIR="$HOME/.config/autostart"
         mkdir -p "$AUTOSTART_DIR"
-        cp "$HOME/Desktop/pokestroke.desktop" "$AUTOSTART_DIR/" 2>/dev/null || \
-        echo "[Desktop Entry]
+        cat <<EOF > "$AUTOSTART_DIR/pokestroke.desktop"
+[Desktop Entry]
 Type=Application
 Name=Pokestroke
 Exec=$INSTALL_DIR/$BIN_NAME
-Path=$INSTALL_DIR" > "$AUTOSTART_DIR/pokestroke.desktop"
+Path=$INSTALL_DIR
+EOF
         echo "✅ Added to autostart."
     fi
 fi
