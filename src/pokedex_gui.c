@@ -282,6 +282,7 @@ static void DrawIndicators(PokedexGUI *gui, Pokedex *pokedex)
         if (pokedex->registered[i * VARIANT_COUNT] == POKEDEX_REGISTERED)
         {
             normalCaught++;
+            normalSeen++;
         }
     }
     DrawText(TextFormat("Normal: %d/%d", normalSeen, normalCaught), x + 30, y + 70, 18, BLACK);
@@ -298,6 +299,7 @@ static void DrawIndicators(PokedexGUI *gui, Pokedex *pokedex)
         if (pokedex->registered[i * VARIANT_COUNT + 1] == POKEDEX_REGISTERED)
         {
             shinyCaught++;
+            shinySeen++;
         }
     }
     DrawText(TextFormat("Shiny: %d/%d", shinySeen, shinyCaught), x + 30, y + 90, 18, BLACK);
@@ -314,6 +316,7 @@ static void DrawIndicators(PokedexGUI *gui, Pokedex *pokedex)
         if (pokedex->registered[i * VARIANT_COUNT + 2] == POKEDEX_REGISTERED)
         {
             bwCaught++;
+            bwSeen++;
         }
     }
     DrawText(TextFormat("Black & White: %d/%d", bwSeen, bwCaught), x + 30, y + 110, 18, BLACK);
