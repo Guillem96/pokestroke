@@ -58,6 +58,11 @@ void InitBackgroundInput()
 bool IsBackgroundKeyDown(int vKey)
 {
     // Use kCGEventSourceStateHIDSystemState for better background reliability
+    if (vKey == 1)
+        return CGEventSourceButtonState(kCGEventSourceStateHIDSystemState, kCGMouseButtonLeft);
+    if (vKey == 2)
+        return CGEventSourceButtonState(kCGEventSourceStateHIDSystemState, kCGMouseButtonRight);
+
     return CGEventSourceKeyState(kCGEventSourceStateHIDSystemState, (CGKeyCode)vKey);
 }
 

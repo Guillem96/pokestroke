@@ -176,6 +176,8 @@ void GameManagerDraw(const GameManager *manager)
         PokedexGUIDraw(manager->pokedexGUI);
         return;
     }
+
+    SetWindowSize(256, 256);
     if (manager->currentState == GAME_MANAGER_STATE_SPAWN_POKEMON)
     {
         PokemonSpawnAnimationDraw(manager->spawnAnim);
