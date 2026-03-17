@@ -96,13 +96,13 @@ jobs:
           zip -r pokestroke-macos.zip .
           mv pokestroke-macos.zip ../
 
-      - name: Package Linux
-        run: |
-          mkdir linux-dist
-          cp -r linux-bin/* linux-dist/
-          cd linux-dist
-          zip -r pokestroke-linux.zip .
-          mv pokestroke-linux.zip ../
+      # - name: Package Linux
+      #   run: |
+      #     mkdir linux-dist
+      #     cp -r linux-bin/* linux-dist/
+      #     cd linux-dist
+      #     zip -r pokestroke-linux.zip .
+      #     mv pokestroke-linux.zip ../
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -110,7 +110,6 @@ jobs:
           files: |
             pokestroke-windows.zip
             pokestroke-macos.zip
-            pokestroke-linux.zip
             resources.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
