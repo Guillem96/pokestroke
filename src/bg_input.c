@@ -27,7 +27,7 @@ int GetBackgroundAnyKeyPressed()
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 Vector2 GetMouseScreenPosition()
 {
