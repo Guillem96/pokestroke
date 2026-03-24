@@ -12,6 +12,7 @@
 #include "pokeball_anim.h"
 #include "pkmn_spawn_anim.h"
 #include "dialog_box.h"
+#include "utils.h"
 
 // "Business" logic functions
 static void SpawnRandomPokemon(GameManager *manager);
@@ -269,7 +270,7 @@ static void SpawnRandomPokemon(GameManager *manager)
         exit(1);
     }
 
-    unsigned int pokemonId = GetRandomValue(0, POKEMON_COUNT - 1);
+    unsigned int pokemonId = SampleFromWeightedDistribution(POKEMON_SPAWN_WEIGHTS, POKEMON_COUNT);
     float variantRoll = (float)rand() / (float)RAND_MAX;
     unsigned short variant;
     if (variantRoll < PKMN_BW_PROBABILITY)

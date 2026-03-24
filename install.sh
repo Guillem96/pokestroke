@@ -53,7 +53,7 @@ if [[ $confirm_shortcut =~ ^[yY](es)?$ ]]; then
         osacompile -x -o "$SHORTCUT_PATH" -e "do shell script \"$INSTALL_DIR/$BIN_NAME > /dev/null 2>&1 &\""
         cp "$INSTALL_DIR/resources/icon.icns" "$SHORTCUT_PATH/Contents/Resources/icon.icns"
         /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string com.guillem96.pokestroke" "$SHORTCUT_PATH/Contents/Info.plist"
-        /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string icon.icns" "$SHORTCUT_PATH/Contents/Info.plist"
+        /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile string icon.icns" "$SHORTCUT_PATH/Contents/Info.plist"
         echo "✅ macOS App Shortcut created on Desktop (No Terminal)."
     else
         DESKTOP_FILE="$HOME/Desktop/pokestroke.desktop"

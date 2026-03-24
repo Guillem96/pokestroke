@@ -2,6 +2,7 @@
 #define POKEDEX_H
 
 extern const char *POKEMON_NAMES[];
+extern const unsigned short POKEMON_SPAWN_WEIGHTS[];
 
 #define POKEMON_COUNT 251
 #define VARIANT_COUNT 3
