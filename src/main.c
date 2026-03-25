@@ -7,12 +7,14 @@
 #include "game_manager.h"
 #include "gameboy_frame.h"
 #include "window_dragger.h"
+#include "menu_bar_config.h"
 
 static const char *GetUserHomeDir(void);
 static void SetupGameFilesystem(void);
 
 int main()
 {
+	MenuBarConfigInit();
 	SetupGameFilesystem();
 
 	// Behave as an overlay
@@ -48,6 +50,7 @@ int main()
 			break;
 		}
 		WindowDraggerUpdate();
+		MenuBarConfigUpdate();
 
 		BeginDrawing();
 		ClearBackground(BLANK);
@@ -58,6 +61,7 @@ int main()
 
 	GameBoyFrameUnload();
 	GameManagerUnload(manager);
+	MenuBarConfigUnload();
 	CloseWindow();
 	return 0;
 }

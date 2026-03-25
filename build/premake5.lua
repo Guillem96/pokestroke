@@ -67,9 +67,41 @@ function check_raylib()
     os.chdir("../")
 end
 
+function check_tray()
+    os.chdir("external")
+    if(os.isdir("tray-master") == false) then
+        print("Tray library not found, downloading from github")
+        local result_str, response_code = http.download("https://github.com/dmikushin/tray/archive/refs/heads/master.zip", "tray-master.zip", {
+            progress = download_progress,
+            headers = { "From: Premake", "Referer: Premake" }
+        })
+
+        print("Unzipping to " ..  os.getcwd())
+        zip.extract("tray-master.zip", os.getcwd())
+        os.remove("tray-master.zip")
+    end
+    os.chdir("../")
+end
+
+function build_tray()
+    local tray_path = path.getabsolute("external/tray-master")
+    local build_path = tray_path .. "/build"
+
+    if (os.isdir(build_path) == false) then
+        os.mkdir(build_path)
+    end
+
+    print("Building tray library with CMake + Ninja")
+
+    os.execute("cd " .. build_path .. " && cmake -G Ninja -DBUILD_SHARED_LIBS=OFF ..")
+    os.execute("cd " .. build_path .. " && ninja")
+end
+
 function build_externals()
      print("calling externals")
      check_raylib()
+     check_tray()
+     build_tray()
 end
 
 function platform_defines()
@@ -206,8 +238,10 @@ if (downloadRaylib) then
         
         includedirs { "../src" }
         includedirs { "../include" }
+        includedirs { "external/tray-master" }
 
         links {"raylib"}
+        links {"tray"}
 
         cdialect "C17"
         cppdialect "C++17"
@@ -241,6 +275,17 @@ if (downloadRaylib) then
         filter "system:macosx"
             links {"OpenGL.framework", "Cocoa.framework", "IOKit.framework", "CoreFoundation.framework", "CoreAudio.framework", "CoreVideo.framework", "AudioToolbox.framework"}
 
+        filter "system:linux"
+            libdirs { "external/tray-master/build" }
+            links { "tray" }
+
+        filter "system:windows"
+            libdirs { "external/tray-master/build" }
+            links { "tray" }
+
+        filter "system:macosx"
+            libdirs { "external/tray-master/build" }
+            links { "tray" }
         filter{}
         
 
