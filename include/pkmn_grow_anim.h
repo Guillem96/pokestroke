@@ -4,7 +4,7 @@
 #include "pkmn_sprite_sheet.h"
 #include "pokeball_anim.h"
 
-#define PKMN_GROW_FRAMES 8
+#define PKMN_GROW_FRAMES 6
 
 typedef struct
 {

@@ -32,15 +32,11 @@ void DialogBoxUpdate(DialogBox *box)
         return;
 
     box->frameCounter += 1;
-    if (box->frameCounter >= box->framesPerChar)
+    box->currentCharIndex = box->frameCounter / box->framesPerChar;
+    if (box->currentCharIndex > box->totalChars)
     {
-        box->frameCounter = 0;
-        box->currentCharIndex++;
-        if (box->currentCharIndex > box->totalChars)
-        {
-            box->currentCharIndex = box->totalChars;
-            box->isComplete = 1;
-        }
+        box->currentCharIndex = box->totalChars;
+        box->isComplete = 1;
     }
 }
 

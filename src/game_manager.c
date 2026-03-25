@@ -94,7 +94,7 @@ void GameManagerInit(GameManager *manager, const char *filePath)
         TraceLog(LOG_ERROR, "Failed to allocate memory for DialogBox.\n");
         exit(1);
     }
-    DialogBoxInit(manager->bottomDialog, "", 1, (Rectangle){55, 175, 145, 35}, false);
+    DialogBoxInit(manager->bottomDialog, "", 0.5, (Rectangle){55, 175, 145, 35}, false);
 
     manager->numKsDialog = (DialogBox *)malloc(sizeof(DialogBox));
     if (manager->numKsDialog == NULL)
@@ -102,7 +102,7 @@ void GameManagerInit(GameManager *manager, const char *filePath)
         TraceLog(LOG_ERROR, "Failed to allocate memory for numKsDialog DialogBox.\n");
         exit(1);
     }
-    DialogBoxInit(manager->numKsDialog, "", 1, (Rectangle){55, 153, 90, 18}, true);
+    DialogBoxInit(manager->numKsDialog, "", 0, (Rectangle){55, 153, 90, 18}, true);
 
     manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
 

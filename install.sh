@@ -4,6 +4,7 @@
 REPO="Guillem96/pokestroke"
 INSTALL_DIR="$HOME/.pokestroke"
 BIN_NAME="pokestroke" 
+BIN_PATH="$INSTALL_DIR/$BIN_NAME"
 
 echo "🚀 Installing Pokestroke..."
 
@@ -50,10 +51,13 @@ if [[ $confirm_shortcut =~ ^[yY](es)?$ ]]; then
     if [ "$IS_MAC" = true ]; then
         SHORTCUT_PATH="$HOME/Desktop/Pokestroke.app"
         # Create a small AppleScript app that runs the binary silently
-        osacompile -x -o "$SHORTCUT_PATH" -e "do shell script \"$INSTALL_DIR/$BIN_NAME > /dev/null 2>&1 &\""
+        mkdir -p "$SHORTCUT_PATH/Contents/MacOS"
+        mkdir -p "$SHORTCUT_PATH/Contents/Resources"
+
         cp "$INSTALL_DIR/resources/icon.icns" "$SHORTCUT_PATH/Contents/Resources/icon.icns"
-        /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string com.guillem96.pokestroke" "$SHORTCUT_PATH/Contents/Info.plist"
-        /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile string icon.icns" "$SHORTCUT_PATH/Contents/Info.plist"
+        cp "$BIN_PATH" "$SHORTCUT_PATH/Contents/MacOS/pokestroke"
+        cp "$INSTALL_DIR/resources/macos.plist.xml" "$SHORTCUT_PATH/Contents/Info.plist"
+        echo "✅ macOS App Shortcut created on Desktop (No Terminal)."
         echo "✅ macOS App Shortcut created on Desktop (No Terminal)."
     else
         DESKTOP_FILE="$HOME/Desktop/pokestroke.desktop"
