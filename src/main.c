@@ -14,7 +14,6 @@ static void SetupGameFilesystem(void);
 
 int main()
 {
-	MenuBarConfigInit();
 	SetupGameFilesystem();
 
 	// Behave as an overlay
@@ -34,6 +33,7 @@ int main()
 	GameManagerUpdate(manager);
 
 	WindowDraggerInit();
+	MenuBarConfigInit();
 
 	while (!WindowShouldClose())
 	{
@@ -44,9 +44,9 @@ int main()
 			GameManagerUpdate(manager);
 		}
 
-		if (GetKeyPressed() == KEY_ESCAPE)
+		if (GetKeyPressed() == KEY_ESCAPE || g_menuBarConfig.shouldQuit)
 		{
-			TraceLog(LOG_INFO, "ESC pressed, quitting game", key);
+			TraceLog(LOG_INFO, "Quitting game", key);
 			break;
 		}
 		WindowDraggerUpdate();

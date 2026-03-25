@@ -1,5 +1,5 @@
 #include "gameboy_frame.h"
-
+#include "menu_bar_config.h"
 #include "raylib.h"
 
 static Font nintendoFont;
@@ -13,12 +13,23 @@ void GameBoyFrameInit()
 
 Rectangle GameBoyFrameDraw(int size)
 {
-    DrawRectangleRounded((Rectangle){0, 0, size, size}, 0.08f, 8, (Color){235, 235, 235, 255});
-
     int screenBorderX = size * 0.08f;
     int screenBorderY = size * 0.15f;
     int screenBorderWidth = size - screenBorderX * 2;
     int screenBorderHeight = size - (int)(size * 0.25f);
+    if (g_menuBarConfig.minimizedView)
+    {
+        // Screen
+        int screenX = screenBorderX + screenBorderWidth * 0.15f;
+        int screenY = screenBorderY + screenBorderHeight * 0.16f;
+        int screenWidth = screenBorderWidth * 0.7f;
+        int screenHeight = screenBorderHeight * 0.75f;
+        Rectangle screenRectangle = {screenX, screenY, screenWidth, screenHeight};
+        DrawRectangleRounded(screenRectangle, 0.08f, 8, (Color){248, 248, 248, 255});
+        return screenRectangle;
+    }
+
+    DrawRectangleRounded((Rectangle){0, 0, size, size}, 0.08f, 8, (Color){235, 235, 235, 255});
 
     // Notches
     DrawRectangle(0, screenBorderX, size, 3, (Color){207, 207, 207, 255});

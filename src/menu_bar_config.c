@@ -3,11 +3,6 @@
 #include <stdio.h>
 #include "raylib.h"
 
-MenuBarConfig g_menuBarConfig = {
-    0,
-    0,
-    0,
-};
 #if defined(__clang__)
 #include <libc.h>
 #else
@@ -25,99 +20,91 @@ MenuBarConfig g_menuBarConfig = {
 #include "tray.h"
 
 #if TRAY_QT
-#define TRAY_ICON1 "icon-24px.png"
-#define TRAY_ICON2 "icon2-24px.png"
+#define TRAY_ICON "icon-24px.png"
 #elif TRAY_APPKIT
-#define TRAY_ICON1 "icon.png"
-#define TRAY_ICON2 "icon2.png"
+#define TRAY_ICON "icon.png"
 #elif TRAY_WINAPI
-#define TRAY_ICON1 "icon.ico"
-#define TRAY_ICON2 "icon2.ico"
+#define TRAY_ICON "icon.ico"
 #endif
 
-void window_cb()
-{
-    printf("window cb: this is where you would make a window visible.\n");
-}
+MenuBarConfig g_menuBarConfig = {
+    .showPokedex = 0,
+    .showConfig = 0,
+    .minimizedView = 1,
+    .shouldQuit = 0,
+};
 
-void toggle_cb(struct tray_menu_item *item)
+static void toggle_pokedex_cb(struct tray_menu_item *item);
+static void toggle_minimized_view_cb(struct tray_menu_item *item);
+static void quit_cb(struct tray_menu_item *item);
+static void move_window_cb(struct tray_menu_item *item);
+
+// Test tray init
+struct tray tray = {
+    .icon_filepath = TRAY_ICON,
+    .tooltip = "PokeStroke",
+    .menu =
+        (struct tray_menu_item[]){
+            {.text = "Show Pokedex", .checked = 0, .cb = toggle_pokedex_cb},
+            {.text = "Minimized View", .checked = 1, .cb = toggle_minimized_view_cb},
+            {.text = "-"},
+            {.text = "Window Position",
+             .submenu =
+                 (struct tray_menu_item[]){
+                     {.text = "Bottom Left", .cb = move_window_cb},
+                     {.text = "Bottom Right", .cb = move_window_cb},
+                     {.text = NULL}},
+             .cb = NULL},
+
+            {.text = "-"},
+            {.text = "Quit", .cb = quit_cb},
+            {.text = NULL}},
+};
+
+void toggle_pokedex_cb(struct tray_menu_item *item)
 {
-    printf("toggle cb\n");
     item->checked = !item->checked;
-    struct tray *tray = tray_get_instance();
-    if (tray != NULL)
-        tray_update(tray);
+    g_menuBarConfig.showPokedex = item->checked;
+    struct tray *ct = tray_get_instance();
+    if (ct != NULL)
+        tray_update(ct);
 }
 
-void hello_cb(struct tray_menu_item *item)
+void toggle_minimized_view_cb(struct tray_menu_item *item)
 {
-    (void)item;
-    printf("hello cb: changing icon\n");
-    struct tray *tray = tray_get_instance();
-    if (tray == NULL)
-        return;
-    if (strcmp(tray->icon_filepath, TRAY_ICON1) == 0)
-    {
-        tray->icon_filepath = TRAY_ICON2;
-    }
-    else
-    {
-        tray->icon_filepath = TRAY_ICON1;
-    }
-    tray_update(tray);
+    printf("toggle minimized view cb\n");
+    item->checked = !item->checked;
+    g_menuBarConfig.minimizedView = item->checked;
+    struct tray *ct = tray_get_instance();
+    if (ct != NULL)
+        tray_update(ct);
 }
 
 void quit_cb(struct tray_menu_item *item)
 {
     (void)item;
-    printf("quit cb\n");
+    g_menuBarConfig.shouldQuit = 1;
     tray_exit();
 }
 
-void submenu_cb(struct tray_menu_item *item)
+void move_window_cb(struct tray_menu_item *item)
 {
     (void)item;
-    printf("submenu: clicked on %s\n", item->text);
-    //  tray_update(tray_get_instance());
+    int minimizedOffsetX = g_menuBarConfig.minimizedView ? 45 : -10;
+    int minimizedOffsetY = g_menuBarConfig.minimizedView ? 30 : -10;
+    if (strcmp(item->text, "Bottom Left") == 0)
+    {
+        SetWindowMonitor(GetCurrentMonitor());
+        SetWindowPosition(-minimizedOffsetX, GetMonitorHeight(GetCurrentMonitor()) - GetScreenHeight() + minimizedOffsetY);
+    }
+    else if (strcmp(item->text, "Bottom Right") == 0)
+    {
+        printf("Moving window to bottom right\n");
+        SetWindowMonitor(GetCurrentMonitor());
+        SetWindowPosition(GetMonitorWidth(GetCurrentMonitor()) - GetScreenWidth() + minimizedOffsetX, GetMonitorHeight(GetCurrentMonitor()) - GetScreenHeight() + minimizedOffsetY);
+    }
 }
 
-// Test tray init
-struct tray tray = {
-    .icon_filepath = TRAY_ICON1,
-    .tooltip = "Tray",
-    .cb = window_cb,
-    .menu =
-        (struct tray_menu_item[]){
-            {.text = "Change Icon", .cb = hello_cb},
-            {.text = "Checked", .checked = 1, .cb = toggle_cb},
-            {.text = "Disabled", .disabled = 1},
-            {.text = "-"},
-            {.text = "SubMenu",
-             .submenu =
-                 (struct tray_menu_item[]){
-                     {.text = "FIRST", .checked = 1, .cb = submenu_cb},
-                     {.text = "SECOND",
-                      .submenu =
-                          (struct tray_menu_item[]){
-                              {.text = "THIRD",
-                               .submenu =
-                                   (struct tray_menu_item[]){
-                                       {.text = "7", .cb = submenu_cb},
-                                       {.text = "-"},
-                                       {.text = "8", .cb = submenu_cb},
-                                       {.text = NULL}}},
-                              {.text = "FOUR",
-                               .submenu =
-                                   (struct tray_menu_item[]){
-                                       {.text = "5", .cb = submenu_cb},
-                                       {.text = "6", .cb = submenu_cb},
-                                       {.text = NULL}}},
-                              {.text = NULL}}},
-                     {.text = NULL}}},
-            {.text = "-"},
-            {.text = "Quit", .cb = quit_cb},
-            {.text = NULL}},
-};
 void MenuBarConfigInit()
 {
     if (tray_init(&tray) < 0)

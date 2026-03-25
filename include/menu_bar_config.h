@@ -16,6 +16,7 @@ typedef struct
     int showPokedex;
     int showConfig;
     int shouldQuit;
+    int minimizedView;
 } MenuBarConfig;
 
 extern MenuBarConfig g_menuBarConfig;
