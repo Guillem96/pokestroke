@@ -7,6 +7,7 @@
 #include "game_manager.h"
 #include "gameboy_frame.h"
 #include "window_dragger.h"
+#include "menu_bar_config.h"
 
 static const char *GetUserHomeDir(void);
 static void SetupGameFilesystem(void);
@@ -32,6 +33,7 @@ int main()
 	GameManagerUpdate(manager);
 
 	WindowDraggerInit();
+	MenuBarConfigInit();
 
 	while (!WindowShouldClose())
 	{
@@ -42,12 +44,13 @@ int main()
 			GameManagerUpdate(manager);
 		}
 
-		if (GetKeyPressed() == KEY_ESCAPE)
+		if (GetKeyPressed() == KEY_ESCAPE || g_menuBarConfig.shouldQuit)
 		{
-			TraceLog(LOG_INFO, "ESC pressed, quitting game", key);
+			TraceLog(LOG_INFO, "Quitting game", key);
 			break;
 		}
 		WindowDraggerUpdate();
+		MenuBarConfigUpdate();
 
 		BeginDrawing();
 		ClearBackground(BLANK);
@@ -58,6 +61,7 @@ int main()
 
 	GameBoyFrameUnload();
 	GameManagerUnload(manager);
+	MenuBarConfigUnload();
 	CloseWindow();
 	return 0;
 }

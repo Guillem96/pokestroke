@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "menu_bar_config.h"
 #include "game_state.h"
 #include "pokedex.h"
 #include "pokedex_gui.h"
@@ -172,7 +173,7 @@ void GameManagerUpdate(GameManager *manager)
 
 void GameManagerDraw(const GameManager *manager)
 {
-    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
+    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX || g_menuBarConfig.showPokedex)
     {
         PokedexGUIDraw(manager->pokedexGUI);
         return;

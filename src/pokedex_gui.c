@@ -1,6 +1,6 @@
 
 #include "pokedex_gui.h"
-
+#include "menu_bar_config.h"
 #include <stdlib.h>
 
 #include "raylib.h"
@@ -40,6 +40,7 @@ void PokedexGUIUpdate(PokedexGUI *gui)
     if (IsKeyPressed(KEY_P))
     {
         // Go back to main menu
+        g_menuBarConfig.showPokedex = 0;
         gui->page = 0;
         gui->selectedPkmnIndex = 0;
         return;

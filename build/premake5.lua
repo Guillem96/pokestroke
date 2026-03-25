@@ -67,9 +67,26 @@ function check_raylib()
     os.chdir("../")
 end
 
+function check_tray()
+    os.chdir("external")
+    if(os.isdir("tray-master") == false) then
+        print("Tray library not found, downloading from github")
+        local result_str, response_code = http.download("https://github.com/dmikushin/tray/archive/refs/heads/master.zip", "tray-master.zip", {
+            progress = download_progress,
+            headers = { "From: Premake", "Referer: Premake" }
+        })
+
+        print("Unzipping to " ..  os.getcwd())
+        zip.extract("tray-master.zip", os.getcwd())
+        os.remove("tray-master.zip")
+    end
+    os.chdir("../")
+end
+
 function build_externals()
      print("calling externals")
      check_raylib()
+     check_tray()
 end
 
 function platform_defines()
@@ -207,19 +224,20 @@ if (downloadRaylib) then
         includedirs { "../src" }
         includedirs { "../include" }
 
-        links {"raylib"}
+        links { "raylib", "tray" }
 
         cdialect "C17"
         cppdialect "C++17"
 
         includedirs {raylib_dir .. "/src" }
+        includedirs {"external/tray-master" }
 
         flags { "ShadowedVariables"}
         platform_defines()
 
         filter "action:vs*"
             defines{"_WINSOCK_DEPRECATED_NO_WARNINGS", "_CRT_SECURE_NO_WARNINGS"}
-            dependson {"raylib"}
+            dependson {"raylib", "tray"}
             links {"raylib.lib"}
             characterset ("Unicode")
             buildoptions { "/Zc:__cplusplus" }
@@ -304,3 +322,29 @@ if (downloadRaylib) then
             compileas "Objective-C"
 
         filter{}
+    
+    project "tray"
+        kind "StaticLib"
+        location "build_files/"
+        language "C"
+
+        targetdir "../bin/%{cfg.buildcfg}"
+
+        includedirs {"external/tray-master"}
+
+        filter "system:windows"
+            files { "external/tray-master/tray_windows.c", "external/tray-master/tray.h" }
+            defines { "TRAY_WINAPI=1" }
+
+        filter "system:linux"
+            files { "external/tray-master/QtTrayMenu.cpp", "external/tray-master/QtTrayMenu.h", "external/tray-master/tray.h", "external/tray-master/tray_linux.cpp" }
+            defines { "TRAY_APPINDICATOR=1" }
+            buildoptions { "$(pkg-config --cflags appindicator3-0.1)" }
+            linkoptions { "$(pkg-config --libs appindicator3-0.1)" }
+
+        filter "system:macosx"
+            files { "external/tray-master/tray_darwin.m", "external/tray-master/tray.h" }
+            defines { "TRAY_APPKIT=1" }
+            links { "Cocoa.framework" }
+
+        filter {}
