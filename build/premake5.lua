@@ -333,7 +333,7 @@ if (downloadRaylib) then
         includedirs {"external/tray-master"}
 
         filter "system:windows"
-            files { "external/tray-master/tray_windos.c", "external/tray-master/tray.h" }
+            files { "external/tray-master/tray_windows.c", "external/tray-master/tray.h" }
             defines { "TRAY_WINAPI=1" }
 
         filter "system:linux"
