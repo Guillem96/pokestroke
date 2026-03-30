@@ -334,7 +334,7 @@ if (downloadRaylib) then
 
         filter "system:windows"
             files { "external/tray-master/tray_windows.c", "external/tray-master/tray.h" }
-            defines { "TRAY_WINAPI=1" }
+            defines { "TRAY_WINAPI=1", "TRAY_EXPORTS", "WIN32_LEAN_AND_MEAN" }
 
         filter "system:linux"
             files { "external/tray-master/QtTrayMenu.cpp", "external/tray-master/QtTrayMenu.h", "external/tray-master/tray.h", "external/tray-master/tray_linux.cpp" }
