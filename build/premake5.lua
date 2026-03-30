@@ -327,24 +327,36 @@ if (downloadRaylib) then
         kind "StaticLib"
         location "build_files/"
         language "C"
+        cdialect "C99"
 
         targetdir "../bin/%{cfg.buildcfg}"
 
         includedirs {"external/tray-master"}
+        files {}
 
         filter "system:windows"
             files { "external/tray-master/tray_windows.c" }
-            defines { "TRAY_WINAPI=1", "TRAY_EXPORTS", "WIN32_LEAN_AND_MEAN", "NOMINMAX" }
+            defines {
+                "TRAY_EXPORTS",
+                "TRAY_WINAPI=1",
+                "WIN32_LEAN_AND_MEAN",
+                "NOMINMAX",
+                "_CRT_SECURE_NO_WARNINGS"
+            }
 
         filter "system:linux"
-            files { "external/tray-master/QtTrayMenu.cpp", "external/tray-master/QtTrayMenu.h", "external/tray-master/tray.h", "external/tray-master/tray_linux.cpp" }
-            defines { "TRAY_APPINDICATOR=1" }
+            language "C++" -- needed because of .cpp files
+            cppdialect "C++17"
+            files { "external/tray-master/QtTrayMenu.cpp", "external/tray-master/tray_linux.cpp" }
+            defines { "TRAY_APPINDICATOR=1", "TRAY_EXPORTS", "TRAY_QT6=1" }
             buildoptions { "$(pkg-config --cflags appindicator3-0.1)" }
             linkoptions { "$(pkg-config --libs appindicator3-0.1)" }
 
         filter "system:macosx"
-            files { "external/tray-master/tray_darwin.m", "external/tray-master/tray.h" }
+            files { "external/tray-master/tray_darwin.m" }
             defines { "TRAY_APPKIT=1" }
             links { "Cocoa.framework" }
 
         filter {}
+
+        visibility "Hidden"
