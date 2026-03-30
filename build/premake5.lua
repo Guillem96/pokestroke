@@ -224,6 +224,7 @@ if (downloadRaylib) then
         includedirs { "../src" }
         includedirs { "../include" }
 
+        dependson {"raylib", "tray"}
         links { "raylib", "tray" }
 
         cdialect "C17"
@@ -238,7 +239,7 @@ if (downloadRaylib) then
         filter "action:vs*"
             defines{"_WINSOCK_DEPRECATED_NO_WARNINGS", "_CRT_SECURE_NO_WARNINGS"}
             dependson {"raylib", "tray"}
-            links {"raylib.lib"}
+            links {"raylib.lib", "tray.lib"}
             characterset ("Unicode")
             buildoptions { "/Zc:__cplusplus" }
 
