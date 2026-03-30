@@ -224,8 +224,8 @@ if (downloadRaylib) then
         includedirs { "../src" }
         includedirs { "../include" }
 
-        dependson {"raylib", "tray"}
         links { "raylib", "tray" }
+        dependson {"raylib", "tray"}
 
         cdialect "C17"
         cppdialect "C++17"
