@@ -189,6 +189,7 @@ if (downloadRaylib) then
         kind "ConsoleApp"
         location "build_files/"
         targetdir "../bin/%{cfg.buildcfg}"
+        objdir "../bin-int/%{cfg.buildcfg}"
 
         filter {"system:windows", "configurations:Release", "action:gmake*"}
             kind "WindowedApp"
@@ -325,12 +326,13 @@ if (downloadRaylib) then
         filter{}
     
     project "tray"
-        kind "StaticLib"
+        kind "SharedLib"
         location "build_files/"
         language "C"
         cdialect "C99"
 
         targetdir "../bin/%{cfg.buildcfg}"
+        objdir "../bin-int/%{cfg.buildcfg}"
 
         includedirs {"external/tray-master"}
         files {}
