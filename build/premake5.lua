@@ -245,7 +245,7 @@ if (downloadRaylib) then
             buildoptions { "/Zc:__cplusplus" }
 
         filter "system:windows"
-            defines{"_WIN32"}
+            defines {"_WIN32", "TRAY_WINAPI=1", "TRAY_STATIC"}
             links {"winmm", "gdi32", "opengl32"}
             libdirs {"../bin/%{cfg.buildcfg}"}
 
