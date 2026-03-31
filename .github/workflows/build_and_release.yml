@@ -29,7 +29,6 @@ jobs:
       - name: Package MSIX
         shell: powershell
         run: |
-          chmod +x ci/package_msix.ps1
           ./ci/package_msix.ps1
 
       - name: Upload Windows Build

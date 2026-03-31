@@ -2,20 +2,31 @@
 $BuildDir = "bin/Release"
 $LayoutDir = "msix_layout"
 $PackageName = "Pokestroke.msix"
-
-# 1. Find the Windows SDK installation path
+# 1. Locate the Windows SDK bin folder
 $sdkRoot = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
-# Get the latest version folder (e.g., 10.0.22621.0)
-$latestSdk = Get-ChildItem -Path $sdkRoot -Directory | Sort-Object Name -Descending | Select-Object -First 1
 
-if ($null -eq $latestSdk) {
-    throw "Windows SDK not found in $sdkRoot"
+# 2. Specifically look for folders starting with '10.' (the version numbers)
+$versionFolder = Get-ChildItem -Path $sdkRoot -Directory -Filter "10.*" | 
+                 Sort-Object Name -Descending | 
+                 Select-Object -First 1
+
+if ($null -eq $versionFolder) {
+    # Fallback for very old SDKs where x64 might be directly in bin
+    $toolPath = Join-Path $sdkRoot "x64"
+} else {
+    $toolPath = Join-Path $versionFolder.FullName "x64"
 }
 
-# 2. Specifically target the x64 binaries
-$toolPath = Join-Path $latestSdk.FullName "x64"
 $MakeAppx = Join-Path $toolPath "makeappx.exe"
 $SignTool = Join-Path $toolPath "signtool.exe"
+
+# 3. Double-check the tools actually exist before running
+if (-not (Test-Path $MakeAppx)) { 
+    Write-Error "Could not find makeappx.exe at $MakeAppx"
+    exit 1 
+}
+
+Write-Host "Using tools from: $toolPath"
 
 # 2. Prepare Layout Folder
 if (Test-Path $LayoutDir) { Remove-Item -Recurse -Force $LayoutDir }
