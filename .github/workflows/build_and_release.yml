@@ -59,12 +59,10 @@ jobs:
 
       - name: Package .app Bundle
         run: |
-          mkdir -p macos-app
           chmod +x ci/package-macos-app.sh
-          cd macos-app
-          ../ci/package-macos-app.sh
+          ./ci/package-macos-app.sh
           # Zip the .app folder specifically
-          zip -r ../Pokestroke-macOS-App.zip Pokestroke.app
+          zip -r Pokestroke.app.zip Pokestroke.app
 
       - name: Upload MacOS Binaries
         uses: actions/upload-artifact@v4
@@ -92,12 +90,14 @@ jobs:
           mkdir windows-dist
           cp -r windows-bin/* windows-dist/
           zip -r pokestroke-windows-bin.zip windows-dist/
+          cp windows-msix/Pokestroke.msix Pokestroke.msix
 
       - name: Prepare MacOS Binary Release
         run: |
           mkdir macos-bin-dist
           cp -r macos-bin/* macos-bin-dist/
           zip -r pokestroke-macos-bin.zip macos-bin-dist/
+          cp macos-app/Pokestroke.app.zip Pokestroke.app.zip
 
       - name: Package Resources
         run: zip -r resources.zip resources/
@@ -107,8 +107,9 @@ jobs:
         with:
           files: |
             pokestroke-windows-bin.zip
+            Pokestroke.msix
             pokestroke-macos-bin.zip
-            macos-app/Pokestroke-macOS-App.zip
+            Pokestroke.app.zip
             resources.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
