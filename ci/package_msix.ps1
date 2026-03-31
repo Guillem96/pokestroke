@@ -12,8 +12,8 @@ New-Item -ItemType Directory -Path "$LayoutDir/resources"
 Copy-Item "$BuildDir/pokestroke.exe" -Destination "$LayoutDir/"
 Copy-Item -Recurse "resources/*" -Destination "$LayoutDir/resources/"
 Copy-Item "resources/AppxManifest.xml" -Destination "$LayoutDir/"
-Copy-Item "resources/icons/icon*.png" -Destination "$LayoutDir/Assets/"
-Copy-Item "resources/icons/wide.png" -Destination "$LayoutDir/Assets/"
+Copy-Item "resources/icon*.png" -Destination "$LayoutDir/Assets/"
+Copy-Item "resources/wide.png" -Destination "$LayoutDir/Assets/"
 
 # 3. Create the MSIX Package
 # MakeAppx is usually in the Windows SDK path

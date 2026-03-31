@@ -76,12 +76,24 @@ Click the menu bar icon and select "Show Pokedex".
 
 You can install Pokestroke instantly using the terminal. This will download the latest release for your platform and set up the required resources in $HOME/.pokestroke.
 
-### macOS (Apple Silicon)
+###  macOS (Apple Silicon)
 
-Open your terminal and run:
+1. Download [`Pokestroke.app.zip` from the latest release](https://github.com/Guillem96/pokestroke/releases). Locate the file in your Downloads folder and double-click to unzip it.
+
+2. Move to Applications. Drag `Pokestroke.app` into your Applications folder.
+
+> Note: Moving the app out of the Downloads folder helps bypass 
+> "App Translocation," a macOS security feature that can sometimes
+> prevent games from finding their internal resource folders.
+
+3. Bypass the "Damaged" or "Unverified" Message. Because this app is not signed with an
+Apple Developer Certificate, macOS may prevent it from opening.
+
+If the app refuses to launch, macOS has likely "quarantined" the file. Open your Terminal
+(Cmd + Space, type "Terminal") and run the following command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Guillem96/pokestroke/main/install.sh | bash
+xattr -cr /Applications/Pokestroke.app
 ```
 
 ### Windows

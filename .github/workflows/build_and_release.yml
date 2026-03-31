@@ -73,7 +73,7 @@ jobs:
       - name: Upload MacOS App Bundle
         uses: actions/upload-artifact@v4
         with:
-          name: macos-app
+          name: Pokestroke.app
           path: Pokestroke.app.zip
 
   create-release:
@@ -97,7 +97,7 @@ jobs:
           mkdir macos-bin-dist
           cp -r macos-bin/* macos-bin-dist/
           zip -r pokestroke-macos-bin.zip macos-bin-dist/
-          cp macos-app/Pokestroke.app.zip Pokestroke.app.zip
+          cp Pokestroke.app/Pokestroke.app.zip Pokestroke.app.zip
 
       - name: Package Resources
         run: zip -r resources.zip resources/
