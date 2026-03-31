@@ -326,7 +326,7 @@ if (downloadRaylib) then
         filter{}
     
     project "tray"
-        kind "SharedLib"
+        kind "StaticLib"
         location "build_files/"
         language "C"
         cdialect "C99"
