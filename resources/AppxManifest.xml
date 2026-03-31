@@ -9,7 +9,7 @@
   <Properties>
     <DisplayName>Pokestroke</DisplayName>
     <PublisherDisplayName>Guillem96</PublisherDisplayName>
-    <Logo>Assets\logo.png</Logo>
+    <Logo>Assets\icon.png</Logo>
   </Properties>
   <Resources>
     <Resource Language="en-us" />
