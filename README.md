@@ -98,11 +98,26 @@ xattr -cr /Applications/Pokestroke.app
 
 ### Windows
 
-Open PowerShell as an Administrator and run:
+1. Download [`Pokestroke.msix` from the latest release](https://github.com/Guillem96/pokestroke/releases). Double click to install the application.
 
-```bash
-iwr -useb https://raw.githubusercontent.com/Guillem96/pokestroke/main/install.ps1 | iex
-```
+2. If certificates can't be validated follow the described steps below.
+
+3. Open File Properties
+  - Right-click Pokestroke.msix and select Properties.
+  - Go to the Digital Signatures tab.
+
+4. Install the Certificate
+  - Select the signature (Development) in the list and click Details.
+  - Click View Certificate -> Install Certificate...
+  - Choose **Local Machine** and click Next (requires Admin).
+
+5. Select the Correct Store
+  - Select Place all certificates in the following store.
+  - Click Browse and choose **Trusted Root Certification Authorities**.
+  - Click OK -> Next -> Finish.
+
+6. Run the Installer. Double-click Pokestroke.msix again. The "Install" button will now be active. Click it to add the game to your Start Menu.
+
 
 ### 📂 Directory Structure
 
@@ -135,8 +150,9 @@ Planned improvements and features:
 - [x] Force window not to minimize (true overlay mode)
 - [x] Pokédex (caught, seen, missing)
 - [x] Render number of keystrokes pressed
-- [ ] MacOS & Windows installer
-- [ ] CI/CD to build and release the installer
+- [x] MacOS & Windows installer
+- [x] CI/CD to build and release the installer
+- [ ] Trainer card
 - [ ] Use Mono font
 
 ## 🛠️ Built With
