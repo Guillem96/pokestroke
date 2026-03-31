@@ -68,7 +68,7 @@ Good luck. You’ll need it.
 
 ## Gotta type 'em all (PokeDex)
 
-Focus the window and press `P` to open the PokeDex.
+Click the menu bar icon and select "Show Pokedex".
 
 <img src="img/pokedex_1.png" width="300" />
 

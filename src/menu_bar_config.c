@@ -27,6 +27,9 @@
 #define TRAY_ICON "icon.ico"
 #endif
 
+#include "pokedex_gui.h"
+#include "utils.h"
+
 MenuBarConfig g_menuBarConfig = {
     .showPokedex = 0,
     .showConfig = 0,
@@ -65,6 +68,24 @@ void toggle_pokedex_cb(struct tray_menu_item *item)
 {
     item->checked = !item->checked;
     g_menuBarConfig.showPokedex = item->checked;
+
+    if (!g_menuBarConfig.showPokedex)
+    {
+        SetWindowSize(256, 256);
+    }
+    else
+    {
+        Vector2 winPos = GetWindowPosition();
+        Vector2 screenSize = (Vector2){GetScreenWidth(), GetScreenHeight()};
+        Vector2 monitorSize = (Vector2){GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())};
+        Vector2 newPos = {
+            clamp(winPos.x - (POKEDEX_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - POKEDEX_WINDOW_WIDTH),
+            clamp(winPos.y, -(POKEDEX_WINDOW_HEIGHT + screenSize.y), monitorSize.y - POKEDEX_WINDOW_HEIGHT)};
+
+        SetWindowSize(POKEDEX_WINDOW_WIDTH, POKEDEX_WINDOW_HEIGHT);
+        SetWindowPosition(newPos.x, newPos.y);
+    }
+
     struct tray *ct = tray_get_instance();
     if (ct != NULL)
         tray_update(ct);

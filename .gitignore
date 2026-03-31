@@ -409,3 +409,4 @@ Makefile
 /build/compile_commands.json
 
 resources/gamestate.dat
+.DS_Store
