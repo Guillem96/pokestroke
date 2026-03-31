@@ -26,16 +26,17 @@ jobs:
           ./premake5.exe gmake
           cd ..
           mingw32-make.exe config=release_x64
-      - name: Package MSIX
-        shell: powershell
-        run: |
-          ./ci/package_msix.ps1
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
         with:
           name: windows-bin
           path: bin/Release/
+
+      - name: Package MSIX
+        shell: powershell
+        run: |
+          ./ci/package_msix.ps1
 
       - name: Upload MSIX Package
         uses: actions/upload-artifact@v4
