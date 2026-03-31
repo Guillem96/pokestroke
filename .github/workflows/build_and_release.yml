@@ -59,10 +59,11 @@ jobs:
 
       - name: Package .app Bundle
         run: |
+          mkdir -p macos-app
           chmod +x ci/package-macos-app.sh
-          ./ci/package-macos-app.sh
+          cd macos-app
+          ../ci/package-macos-app.sh
           # Zip the .app folder specifically
-          cd macos_bundle
           zip -r ../Pokestroke-macOS-App.zip Pokestroke.app
 
       - name: Upload MacOS Binaries

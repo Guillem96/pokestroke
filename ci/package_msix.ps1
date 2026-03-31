@@ -6,6 +6,7 @@ $PackageName = "Pokestroke.msix"
 # 1. Prepare Layout Folder
 if (Test-Path $LayoutDir) { Remove-Item -Recurse -Force $LayoutDir }
 New-Item -ItemType Directory -Path "$LayoutDir/Assets"
+New-Item -ItemType Directory -Path "$LayoutDir/resources"
 
 # 2. Copy Binary and Resources
 Copy-Item "$BuildDir/pokestroke.exe" -Destination "$LayoutDir/"
