@@ -340,7 +340,6 @@ if (downloadRaylib) then
         filter "system:windows"
             files { "external/tray-master/tray_windows.c" }
             defines {
-                "TRAY_EXPORTS",
                 "TRAY_WINAPI=1",
                 "WIN32_LEAN_AND_MEAN",
                 "NOMINMAX",
