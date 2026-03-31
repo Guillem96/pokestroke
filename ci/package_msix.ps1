@@ -45,7 +45,6 @@ $Cert = New-SelfSignedCertificate -Type Custom -Subject "CN=Development" `
         -CertStoreLocation "Cert:\CurrentUser\My" -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3")
 
 # 5. Sign the Package
-$SignTool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Select-Object -First 1
 & $SignTool sign /fd SHA256 /a /sha1 $Cert.Thumbprint $PackageName
 
 Write-Host "✅ MSIX Package Created and Signed: $PackageName"
