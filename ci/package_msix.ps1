@@ -11,7 +11,7 @@ New-Item -ItemType Directory -Path "$LayoutDir/resources"
 # 2. Copy Binary and Resources
 Copy-Item "$BuildDir/pokestroke.exe" -Destination "$LayoutDir/"
 Copy-Item -Recurse "resources/*" -Destination "$LayoutDir/resources/"
-Copy-Item "AppxManifest.xml" -Destination "$LayoutDir/"
+Copy-Item "resources/AppxManifest.xml" -Destination "$LayoutDir/"
 Copy-Item "resources/icons/icon*.png" -Destination "$LayoutDir/Assets/"
 Copy-Item "resources/icons/wide.png" -Destination "$LayoutDir/Assets/"
 
