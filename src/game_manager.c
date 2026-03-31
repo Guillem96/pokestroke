@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "menu_bar_config.h"
 #include "game_state.h"
 #include "pokedex.h"
 #include "pokedex_gui.h"
@@ -49,6 +50,8 @@ void GameManagerInit(GameManager *manager, const char *filePath)
 {
     SetRandomSeed((unsigned int)time(NULL));
     srand((unsigned int)time(NULL));
+
+    strcpy(manager->checkpoint, filePath);
 
     manager->gameState = (GameState *)malloc(sizeof(GameState));
     if (manager->gameState == NULL)
@@ -122,7 +125,6 @@ void GameManagerUpdate(GameManager *manager)
     GameStateRecordKeyStroke(manager->gameState);
     DialogBoxClearAndUpdateText(manager->numKsDialog,
                                 TextFormat("%sks.", FormatNumber(GameStateGetTotalKeyStrokes(manager->gameState))));
-    manager->numKsDialog->currentCharIndex = strlen(manager->numKsDialog->text);
 
     DialogBoxUpdate(manager->bottomDialog);
     DialogBoxUpdate(manager->numKsDialog);
@@ -172,13 +174,12 @@ void GameManagerUpdate(GameManager *manager)
 
 void GameManagerDraw(const GameManager *manager)
 {
-    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
+    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX || g_menuBarConfig.showPokedex)
     {
         PokedexGUIDraw(manager->pokedexGUI);
         return;
     }
 
-    SetWindowSize(256, 256);
     if (manager->currentState == GAME_MANAGER_STATE_SPAWN_POKEMON)
     {
         PokemonSpawnAnimationDraw(manager->spawnAnim);
@@ -218,7 +219,8 @@ void GameManagerDraw(const GameManager *manager)
 
 void GameManagerUnload(GameManager *manager)
 {
-    GameStateSave(manager->gameState, "gamestate.dat");
+    printf("Unloading game manager and saving state to %s\n", manager->checkpoint);
+    GameStateSave(manager->gameState, manager->checkpoint);
     GameStateUnload(manager->gameState);
     free(manager->gameState);
 
@@ -539,7 +541,7 @@ static void FinalizeCatchFailureState(GameManager *manager)
 static void FinalizePokedexRegisterState(GameManager *manager)
 {
     PokedexRegister(manager->gameState->pokedex, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
-    GameStateSave(manager->gameState, "gamestate.dat");
+    GameStateSave(manager->gameState, manager->checkpoint);
     manager->currentState = GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT;
 }
 
@@ -551,16 +553,17 @@ static void FinalizePokemonFleeState(GameManager *manager)
 
 static void CheckForPokedexOpen(GameManager *manager)
 {
-    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX && IsKeyPressed(KEY_P))
-    {
-        manager->currentState = manager->prevStateBeforePokedex;
-        return;
-    }
-
-    if (IsKeyPressed(KEY_P))
+    if (g_menuBarConfig.showPokedex && manager->currentState != GAME_MANAGER_STATE_SHOW_POKEDEX)
     {
         manager->prevStateBeforePokedex = manager->currentState;
         manager->currentState = GAME_MANAGER_STATE_SHOW_POKEDEX;
+        return;
+    }
+
+    if (!g_menuBarConfig.showPokedex && manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
+    {
+        manager->currentState = manager->prevStateBeforePokedex;
+        return;
     }
 }
 

@@ -7,12 +7,16 @@
 #include "game_manager.h"
 #include "gameboy_frame.h"
 #include "window_dragger.h"
+#include "menu_bar_config.h"
 
 static const char *GetUserHomeDir(void);
+static const char *GetSaveFilePath(void);
+
 static void SetupGameFilesystem(void);
 
 int main()
 {
+	const char *saveFilePath = GetSaveFilePath();
 	SetupGameFilesystem();
 
 	// Behave as an overlay
@@ -25,16 +29,19 @@ int main()
 	InitBackgroundInput();
 
 	GameManager *manager = malloc(sizeof(GameManager));
-	GameManagerInit(manager, "gamestate.dat");
+	GameManagerInit(manager, saveFilePath);
 
 	GameBoyFrameInit();
 
 	GameManagerUpdate(manager);
 
 	WindowDraggerInit();
+	MenuBarConfigInit();
 
 	while (!WindowShouldClose())
 	{
+		MenuBarConfigUpdate();
+
 		int key = GetBackgroundAnyKeyPressed();
 
 		if (key != -1)
@@ -42,9 +49,9 @@ int main()
 			GameManagerUpdate(manager);
 		}
 
-		if (GetKeyPressed() == KEY_ESCAPE)
+		if (GetKeyPressed() == KEY_ESCAPE || g_menuBarConfig.shouldQuit)
 		{
-			TraceLog(LOG_INFO, "ESC pressed, quitting game", key);
+			TraceLog(LOG_INFO, "Quitting game", key);
 			break;
 		}
 		WindowDraggerUpdate();
@@ -58,6 +65,7 @@ int main()
 
 	GameBoyFrameUnload();
 	GameManagerUnload(manager);
+	MenuBarConfigUnload();
 	CloseWindow();
 	return 0;
 }
@@ -78,6 +86,29 @@ static void SetupGameFilesystem(void)
 	// Check if we are in Release mode.
 	// Most compilers define NDEBUG for release builds.
 #if defined(NDEBUG)
+#if defined(__APPLE__)
+	// macOS Bundle Logic: resources are in ../Resources relative to the binary
+	const char *appDir = GetApplicationDirectory();
+	char resourcesPath[512];
+	snprintf(resourcesPath, sizeof(resourcesPath), "%s../Resources", appDir);
+
+	if (DirectoryExists(resourcesPath))
+	{
+		ChangeDirectory(resourcesPath);
+		TraceLog(LOG_INFO, "Filesystem: macOS Bundle detected. Path: %s", resourcesPath);
+	}
+#elif defined(_WIN32)
+	// Windows Bundle Logic: resources are in resources dir inside msix bundle
+	const char *appDir = GetApplicationDirectory();
+	char resourcesPath[512];
+	snprintf(resourcesPath, sizeof(resourcesPath), "%sresources", appDir);
+
+	if (DirectoryExists(resourcesPath))
+	{
+		ChangeDirectory(resourcesPath);
+		TraceLog(LOG_INFO, "Filesystem: macOS Bundle detected. Path: %s", resourcesPath);
+	}
+#else
 	const char *home = GetUserHomeDir();
 	if (home != NULL)
 	{
@@ -92,6 +123,7 @@ static void SetupGameFilesystem(void)
 		ChangeDirectory(savePath);
 		TraceLog(LOG_INFO, "Filesystem: Using User Directory [%s]", savePath);
 	}
+#endif
 #else
 	// Debug mode: Use your existing relative search logic
 	if (SearchAndSetResourceDir("resources"))
@@ -102,5 +134,28 @@ static void SetupGameFilesystem(void)
 	{
 		TraceLog(LOG_WARNING, "Filesystem: Could not find local resources directory.");
 	}
+#endif
+}
+
+static const char *GetSaveFilePath(void)
+{
+#if defined(NDEBUG)
+	const char *home = GetUserHomeDir();
+	if (home == NULL)
+	{
+		TraceLog(LOG_ERROR, "Could not determine user home directory!");
+		exit(1);
+	}
+	const char *saveDir = TextFormat("%s/.pokestroke", home);
+	if (!DirectoryExists(saveDir))
+	{
+		MakeDirectory(saveDir);
+	}
+
+	const char *savePath = TextFormat("%s/.pokestroke/gamestate.dat", home);
+	printf("Using save path: %s\n", savePath);
+	return savePath;
+#else
+	return "gamestate.dat";
 #endif
 }

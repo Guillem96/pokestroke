@@ -31,6 +31,13 @@ void DialogBoxUpdate(DialogBox *box)
     if (box->isComplete)
         return;
 
+    if (box->framesPerChar <= 0)
+    {
+        box->currentCharIndex = box->totalChars;
+        box->isComplete = 1;
+        return;
+    }
+
     box->frameCounter += 1;
     box->currentCharIndex = box->frameCounter / box->framesPerChar;
     if (box->currentCharIndex > box->totalChars)

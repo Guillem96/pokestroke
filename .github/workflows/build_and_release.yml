@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     branches: ["main", "master"]
-    tags: ["v*"] # Trigger on version tags
+    tags: ["v*"]
   pull_request:
     branches: ["main", "master"]
 
@@ -26,11 +26,23 @@ jobs:
           ./premake5.exe gmake
           cd ..
           mingw32-make.exe config=release_x64
+
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
         with:
           name: windows-bin
           path: bin/Release/
+
+      - name: Package MSIX
+        shell: powershell
+        run: |
+          ./ci/package_msix.ps1
+
+      - name: Upload MSIX Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msix
+          path: Pokestroke.msix
 
   build-macos:
     runs-on: macos-latest
@@ -44,28 +56,25 @@ jobs:
           ./premake5.osx gmake
           cd ..
           make config=release_arm64
-      - name: Upload MacOS Build
+
+      - name: Package .app Bundle
+        run: |
+          chmod +x ci/package-macos-app.sh
+          ./ci/package-macos-app.sh
+          # Zip the .app folder specifically
+          zip -r Pokestroke.app.zip Pokestroke.app
+
+      - name: Upload MacOS Binaries
         uses: actions/upload-artifact@v4
         with:
           name: macos-bin
           path: bin/Release/
 
-  # build-linux:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Build
-  #       run: |
-  #         cd build
-  #         chmod +x premake5
-  #         ./premake5 ecc
-  #         ./premake5 gmake
-  #         cd ..
-  #         make config=release_x64
-  #     - name: Upload Linux Build
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: linux-bin
+      - name: Upload MacOS App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pokestroke.app
+          path: Pokestroke.app.zip
 
   create-release:
     if: startsWith(github.ref, 'refs/tags/')
@@ -73,43 +82,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Download Artifacts
         uses: actions/download-artifact@v4
 
-      - name: Package Resources
-        run: zip -r resources.zip resources/
-
-      - name: Package Windows
+      - name: Prepare Windows Release
         run: |
           mkdir windows-dist
           cp -r windows-bin/* windows-dist/
-          cd windows-dist
-          zip -r pokestroke-windows.zip .
-          mv pokestroke-windows.zip ../
+          zip -r pokestroke-windows-bin.zip windows-dist/
+          cp windows-msix/Pokestroke.msix Pokestroke.msix
 
-      - name: Package MacOS
+      - name: Prepare MacOS Binary Release
         run: |
-          mkdir macos-dist
-          cp -r macos-bin/* macos-dist/
-          cd macos-dist
-          zip -r pokestroke-macos.zip .
-          mv pokestroke-macos.zip ../
+          mkdir macos-bin-dist
+          cp -r macos-bin/* macos-bin-dist/
+          zip -r pokestroke-macos-bin.zip macos-bin-dist/
+          cp Pokestroke.app/Pokestroke.app.zip Pokestroke.app.zip
 
-      # - name: Package Linux
-      #   run: |
-      #     mkdir linux-dist
-      #     cp -r linux-bin/* linux-dist/
-      #     cd linux-dist
-      #     zip -r pokestroke-linux.zip .
-      #     mv pokestroke-linux.zip ../
+      - name: Package Resources
+        run: zip -r resources.zip resources/
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            pokestroke-windows.zip
-            pokestroke-macos.zip
+            pokestroke-windows-bin.zip
+            Pokestroke.msix
+            pokestroke-macos-bin.zip
+            Pokestroke.app.zip
             resources.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

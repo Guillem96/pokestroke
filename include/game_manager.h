@@ -54,6 +54,7 @@ typedef struct
 typedef struct
 {
     GameState *gameState;
+    char checkpoint[256];
 
     // Extra GUIs
     PokedexGUI *pokedexGUI;

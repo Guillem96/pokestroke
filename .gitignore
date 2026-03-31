@@ -398,6 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 build_files
 raylib-master
+tray-master
 Makefile
 /*.sln
 
@@ -408,3 +409,4 @@ Makefile
 /build/compile_commands.json
 
 resources/gamestate.dat
+.DS_Store

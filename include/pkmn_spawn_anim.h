@@ -3,8 +3,8 @@
 
 #include "pkmn_sprite_sheet.h"
 
-#define POKEMON_SPAWN_ANIMATION_FRAMES 20
-#define PKMN_SPARKLES_FRAMES 20
+#define POKEMON_SPAWN_ANIMATION_FRAMES 26
+#define PKMN_SPARKLES_FRAMES 18
 #define PKMN_SPAWN_NUM_SPARKLES 12
 
 typedef struct

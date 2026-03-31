@@ -1,12 +1,10 @@
 
 #include "pokedex_gui.h"
-
+#include "menu_bar_config.h"
 #include <stdlib.h>
 
 #include "raylib.h"
-
-#define min(a, b) (a > b ? b : a)
-#define max(a, b) (a > b ? a : b)
+#include "utils.h"
 
 #define POKEDEX_COLOR_RED (Color){193, 44, 69, 255}
 #define POKEDEX_COLOR_DARK_RED (Color){131, 27, 46, 255}
@@ -37,13 +35,6 @@ void PokedexGUIInit(PokedexGUI *gui, Pokedex *pokedex, PokemonSpriteSheet *sheet
 
 void PokedexGUIUpdate(PokedexGUI *gui)
 {
-    if (IsKeyPressed(KEY_P))
-    {
-        // Go back to main menu
-        gui->page = 0;
-        gui->selectedPkmnIndex = 0;
-        return;
-    }
 
     if (IsKeyPressed(KEY_DOWN))
     {
@@ -89,7 +80,6 @@ void PokedexGUIUpdate(PokedexGUI *gui)
 
 void PokedexGUIDraw(PokedexGUI *gui)
 {
-    SetWindowSize(POKEDEX_WINDOW_WIDTH, POKEDEX_WINDOW_HEIGHT);
     DrawFrame();
     DrawNames(gui, gui->pokedex);
     DrawPokemon(gui, gui->pokedex);
@@ -178,7 +168,6 @@ static void DrawFrame()
         *font = LoadFont("Pretendo.ttf");
     }
     DrawTextEx(*font, "ARROW KEYS to navigate", (Vector2){POKEDEX_WINDOW_WIDTH - 230, 15}, 12.0f, 2.0f, POKEDEX_COLOR_DARK_RED);
-    DrawTextEx(*font, "P to go back", (Vector2){POKEDEX_WINDOW_WIDTH - 230, 34}, 12.0f, 2.0f, POKEDEX_COLOR_DARK_RED);
 }
 
 static void DrawNames(PokedexGUI *gui, Pokedex *pokedex)
