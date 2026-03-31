@@ -7,4 +7,6 @@
 
 unsigned int SampleFromWeightedDistribution(const unsigned short *weights, unsigned int count);
 
+void SafeSetWindowSize(int width, int height);
+
 #endif

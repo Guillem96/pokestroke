@@ -71,7 +71,7 @@ void toggle_pokedex_cb(struct tray_menu_item *item)
 
     if (!g_menuBarConfig.showPokedex)
     {
-        SetWindowSize(256, 256);
+        SafeSetWindowSize(256, 256);
     }
     else
     {
@@ -82,7 +82,7 @@ void toggle_pokedex_cb(struct tray_menu_item *item)
             clamp(winPos.x - (POKEDEX_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - POKEDEX_WINDOW_WIDTH),
             clamp(winPos.y, -(POKEDEX_WINDOW_HEIGHT + screenSize.y), monitorSize.y - POKEDEX_WINDOW_HEIGHT)};
 
-        SetWindowSize(POKEDEX_WINDOW_WIDTH, POKEDEX_WINDOW_HEIGHT);
+        SafeSetWindowSize(POKEDEX_WINDOW_WIDTH, POKEDEX_WINDOW_HEIGHT);
         SetWindowPosition(newPos.x, newPos.y);
     }
 

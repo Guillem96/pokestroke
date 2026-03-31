@@ -25,3 +25,15 @@ unsigned int SampleFromWeightedDistribution(const unsigned short *weights, unsig
     TraceLog(LOG_ERROR, "SampleFromWeightedDistribution: Invalid weights");
     exit(1);
 }
+
+void SafeSetWindowSize(int width, int height)
+{
+    // Get the scaling factor (e.g., 1.5 for 150% scaling)
+    Vector2 dpi = GetWindowScaleDPI();
+
+    // Adjust the requested size by the DPI factor
+    int finalWidth = (int)(width * dpi.x);
+    int finalHeight = (int)(height * dpi.y);
+
+    SetWindowSize(finalWidth, finalHeight);
+}
