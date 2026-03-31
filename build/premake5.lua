@@ -71,7 +71,7 @@ function check_tray()
     os.chdir("external")
     if(os.isdir("tray-master") == false) then
         print("Tray library not found, downloading from github")
-        local result_str, response_code = http.download("https://github.com/dmikushin/tray/archive/refs/heads/master.zip", "tray-master.zip", {
+        local result_str, response_code = http.download("https://github.com/Guillem96/tray/archive/refs/heads/master.zip", "tray-master.zip", {
             progress = download_progress,
             headers = { "From: Premake", "Referer: Premake" }
         })
@@ -341,6 +341,7 @@ if (downloadRaylib) then
             files { "external/tray-master/tray_windows.c" }
             defines {
                 "TRAY_WINAPI=1",
+                "TRAY_STATIC",
                 "WIN32_LEAN_AND_MEAN",
                 "NOMINMAX",
                 "_CRT_SECURE_NO_WARNINGS"
