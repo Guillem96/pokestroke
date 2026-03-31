@@ -4,29 +4,24 @@ $LayoutDir = "msix_layout"
 $PackageName = "Pokestroke.msix"
 # 1. Locate the Windows SDK bin folder
 $sdkRoot = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
+Write-Host "Searching for SDK tools in $sdkRoot..."
 
-# 2. Specifically look for folders starting with '10.' (the version numbers)
-$versionFolder = Get-ChildItem -Path $sdkRoot -Directory -Filter "10.*" | 
-                 Sort-Object Name -Descending | 
-                 Select-Object -First 1
+# 2. Find the tools by searching for the filename within an 'x64' subfolder
+# This is more reliable than hardcoding version strings
+$MakeAppx = (Get-ChildItem -Path $sdkRoot -Filter "makeappx.exe" -Recurse | 
+             Where-Object { $_.FullName -like "*\x64\*" } | 
+             Select-Object -First 1).FullName
 
-if ($null -eq $versionFolder) {
-    # Fallback for very old SDKs where x64 might be directly in bin
-    $toolPath = Join-Path $sdkRoot "x64"
-} else {
-    $toolPath = Join-Path $versionFolder.FullName "x64"
-}
+$SignTool = (Get-ChildItem -Path $sdkRoot -Filter "signtool.exe" -Recurse | 
+             Where-Object { $_.FullName -like "*\x64\*" } | 
+             Select-Object -First 1).FullName
 
-$MakeAppx = Join-Path $toolPath "makeappx.exe"
-$SignTool = Join-Path $toolPath "signtool.exe"
+# 3. Safety Check: If not found, fail early with a clear message
+if (-not $MakeAppx) { Write-Error "Could not find makeappx.exe in $sdkRoot"; exit 1 }
+if (-not $SignTool) { Write-Error "Could not find signtool.exe in $sdkRoot"; exit 1 }
 
-# 3. Double-check the tools actually exist before running
-if (-not (Test-Path $MakeAppx)) { 
-    Write-Error "Could not find makeappx.exe at $MakeAppx"
-    exit 1 
-}
-
-Write-Host "Using tools from: $toolPath"
+Write-Host "✅ Found MakeAppx: $MakeAppx"
+Write-Host "✅ Found SignTool: $SignTool"
 
 # 2. Prepare Layout Folder
 if (Test-Path $LayoutDir) { Remove-Item -Recurse -Force $LayoutDir }
