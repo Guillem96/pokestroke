@@ -93,10 +93,13 @@ void GameStateSave(const GameState *state, const char *filePath)
         return;
     }
 
+    unsigned short pokedexVersionMarker = 0xA; // Marker to identify pokedex v2
+
     fwrite(&state->currentCapacity, sizeof(unsigned int), 1, file);
     fwrite(state->keyStrokesByDay, sizeof(unsigned long long), state->currentCapacity, file);
     fwrite(&state->startTime, sizeof(time_t), 1, file);
-    fwrite(state->pokedex->registered, sizeof(unsigned short), POKEMON_COUNT * VARIANT_COUNT, file);
+    fwrite(&pokedexVersionMarker, sizeof(unsigned short), 1, file); // Marker to identify pokedex v2
+    fwrite(state->pokedex, sizeof(Pokedex), 1, file);
 
     fclose(file);
 }
@@ -121,7 +124,28 @@ static void InitializeGameStateFromFile(FILE *file, GameState *state)
 
     state->pokedex = malloc(sizeof(Pokedex));
     PokedexInit(state->pokedex);
-    fread(state->pokedex->registered, sizeof(unsigned short), POKEMON_COUNT * VARIANT_COUNT, file);
+
+    unsigned short pokedexVersionMarker;
+    fread(&pokedexVersionMarker, sizeof(unsigned short), 1, file);
+    if (pokedexVersionMarker != 0xA)
+    {
+        // Update old pokedex format to new format
+        unsigned short oldPokedexData[POKEMON_COUNT * VARIANT_COUNT];
+        oldPokedexData[0] = pokedexVersionMarker;
+        fread(&oldPokedexData[1], sizeof(unsigned short), POKEMON_COUNT * VARIANT_COUNT - 1, file);
+        for (unsigned int i = 0; i < POKEMON_COUNT; i++)
+        {
+            for (unsigned int j = 0; j < VARIANT_COUNT; j++)
+            {
+                state->pokedex->registered[i].variantStatus[j] = oldPokedexData[i * VARIANT_COUNT + j];
+                state->pokedex->registered[i].caughtCount[j] = oldPokedexData[i * VARIANT_COUNT + j] == POKEDEX_REGISTERED ? 1 : 0;
+            }
+        }
+    }
+    else
+    {
+        fread(state->pokedex, sizeof(Pokedex), 1, file);
+    }
 
     fclose(file);
 }

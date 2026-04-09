@@ -12,8 +12,13 @@ extern const unsigned short POKEMON_SPAWN_WEIGHTS[];
 
 typedef struct
 {
-    unsigned short *registered;
+    unsigned short variantStatus[VARIANT_COUNT];
+    unsigned long long caughtCount[VARIANT_COUNT];
+} PokedexEntry;
 
+typedef struct
+{
+    PokedexEntry registered[POKEMON_COUNT];
 } Pokedex;
 
 void PokedexInit(Pokedex *pokedex);

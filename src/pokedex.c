@@ -514,27 +514,27 @@ const unsigned short POKEMON_SPAWN_WEIGHTS[] = {
 
 void PokedexInit(Pokedex *pokedex)
 {
-    pokedex->registered = (unsigned short *)malloc(POKEMON_COUNT * VARIANT_COUNT * sizeof(unsigned short));
-    if (pokedex->registered == NULL)
+    for (unsigned int i = 0; i < POKEMON_COUNT; i++)
     {
-        TraceLog(LOG_ERROR, "Failed to allocate memory for Pokedex.\n");
-        exit(1);
-    }
-    for (unsigned int i = 0; i < POKEMON_COUNT * VARIANT_COUNT; i++)
-    {
-        pokedex->registered[i] = POKEDEX_NEVER_SEEN;
+        pokedex->registered[i] = (PokedexEntry){
+            .variantStatus = {POKEDEX_NEVER_SEEN, POKEDEX_NEVER_SEEN, POKEDEX_NEVER_SEEN},
+            .caughtCount = {0, 0, 0},
+        };
     }
 }
 
 void PokedexSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned short variant)
 {
     if (pokemonId >= POKEMON_COUNT || variant >= VARIANT_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid pokemonId or variant in PokedexSeen: pokemonId=%u, variant=%u", pokemonId, variant);
         return;
+    }
 
     unsigned int index = pokemonId * VARIANT_COUNT + variant;
-    if (pokedex->registered[index] == POKEDEX_NEVER_SEEN)
+    if (pokedex->registered[index].variantStatus[variant] == POKEDEX_NEVER_SEEN)
     {
-        pokedex->registered[index] = POKEDEX_SEEN;
+        pokedex->registered[index].variantStatus[variant] = POKEDEX_SEEN;
     }
 }
 
@@ -544,10 +544,10 @@ void PokedexRegister(Pokedex *pokedex, unsigned int pokemonId, unsigned short va
         return;
 
     unsigned int index = pokemonId * VARIANT_COUNT + variant;
-    pokedex->registered[index] = POKEDEX_REGISTERED;
+    pokedex->registered[index].variantStatus[variant] = POKEDEX_REGISTERED;
+    pokedex->registered[index].caughtCount[variant]++;
 }
 
 void PokedexUnload(Pokedex *pokedex)
 {
-    free(pokedex->registered);
 }

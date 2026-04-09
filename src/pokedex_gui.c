@@ -192,7 +192,7 @@ static void DrawNames(PokedexGUI *gui)
         bool isSeen = false;
         for (int j = 0; j < VARIANT_COUNT; j++)
         {
-            if (gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_SEEN || gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_REGISTERED)
+            if (gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_SEEN || gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_REGISTERED)
             {
                 isSeen = true;
                 break;
@@ -207,7 +207,7 @@ static void DrawNames(PokedexGUI *gui)
         DrawText(nameToDraw, nameX, nameY, nameHeight - nameMargin, BLACK);
         PkmnBattleSpriteSheeDrawCaughtIndicator(
             gui->battleSheet,
-            &gui->pokedex->registered[pkmnIndex * VARIANT_COUNT],
+            gui->pokedex->registered[pkmnIndex].variantStatus,
             (Vector2){nameX + nameWidth + 8, nameY}, 1.4f);
 
         if (i == gui->selectedPkmnIndex)
@@ -230,18 +230,30 @@ static void DrawPokemon(PokedexGUI *gui)
     for (int j = 0; j < VARIANT_COUNT; j++)
     {
         int pkmnY = y + j * (PKMN_HEIGHT * scale + margin);
-        if (gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_NEVER_SEEN)
+        if (gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_NEVER_SEEN)
         {
             DrawRectangle(x, pkmnY, PKMN_WIDTH * scale, PKMN_HEIGHT * scale, GRAY);
             DrawText("???", x + (PKMN_WIDTH * scale - MeasureText("???", 20)) / 2, pkmnY + (PKMN_HEIGHT * scale - 20) / 2, 20, BLACK);
         }
-        else if (gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_SEEN)
+        else if (gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_SEEN)
         {
             PkmnSpriteSheetDrawPro(gui->sheet, pkmnIndex, j, (Vector2){x, pkmnY}, scale, false, DARKGRAY);
         }
         else
         {
             PkmnSpriteSheetDrawPro(gui->sheet, pkmnIndex, j, (Vector2){x, pkmnY}, scale, false, WHITE);
+
+            const char *text = TextFormat("x%03llu", gui->pokedex->registered[pkmnIndex].caughtCount[j]);
+            int textWidth = MeasureText(text, 10);
+            int rectangleWidth = textWidth + 10;
+            DrawRectangle(
+                x + PKMN_WIDTH * scale - rectangleWidth, pkmnY, rectangleWidth, 16, (Color){248, 248, 248, 255});
+            DrawText(
+                text, // gui->pokedex->registered[pkmnIndex].caughtCount[j]),
+                x + PKMN_WIDTH * scale - rectangleWidth + 5,
+                pkmnY + 4, 10, BLACK);
+            DrawRectangleLinesEx(
+                (Rectangle){x + PKMN_WIDTH * scale - rectangleWidth, pkmnY, rectangleWidth, 16}, 1, BLACK);
         }
 
         DrawRectangleLinesEx((Rectangle){x, pkmnY, PKMN_WIDTH * scale, PKMN_HEIGHT * scale}, 2, BLACK);
@@ -265,11 +277,11 @@ static void DrawIndicators(PokedexGUI *gui)
     int normalCaught = 0;
     for (int i = 0; i < POKEMON_COUNT; i++)
     {
-        if (pokedex->registered[i * VARIANT_COUNT] == POKEDEX_SEEN)
+        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_REGULAR] == POKEDEX_SEEN)
         {
             normalSeen++;
         }
-        if (pokedex->registered[i * VARIANT_COUNT] == POKEDEX_REGISTERED)
+        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_REGULAR] == POKEDEX_REGISTERED)
         {
             normalCaught++;
             normalSeen++;
@@ -282,11 +294,11 @@ static void DrawIndicators(PokedexGUI *gui)
     int shinyCaught = 0;
     for (int i = 0; i < POKEMON_COUNT; i++)
     {
-        if (pokedex->registered[i * VARIANT_COUNT + 1] == POKEDEX_SEEN)
+        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_SHINY] == POKEDEX_SEEN)
         {
             shinySeen++;
         }
-        if (pokedex->registered[i * VARIANT_COUNT + 1] == POKEDEX_REGISTERED)
+        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_SHINY] == POKEDEX_REGISTERED)
         {
             shinyCaught++;
             shinySeen++;
@@ -299,11 +311,11 @@ static void DrawIndicators(PokedexGUI *gui)
     int bwCaught = 0;
     for (int i = 0; i < POKEMON_COUNT; i++)
     {
-        if (pokedex->registered[i * VARIANT_COUNT + 2] == POKEDEX_SEEN)
+        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_BW] == POKEDEX_SEEN)
         {
             bwSeen++;
         }
-        if (pokedex->registered[i * VARIANT_COUNT + 2] == POKEDEX_REGISTERED)
+        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_BW] == POKEDEX_REGISTERED)
         {
             bwCaught++;
             bwSeen++;

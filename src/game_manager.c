@@ -193,7 +193,7 @@ void GameManagerDraw(const GameManager *manager)
     {
         PkmnBattleSpriteSheetDrawPkmnName(
             manager->battleSheet, POKEMON_NAMES[manager->spawnedPokemon->pokemonId],
-            &manager->gameState->pokedex->registered[manager->spawnedPokemon->pokemonId * PKMN_VARIANTS],
+            manager->gameState->pokedex->registered[manager->spawnedPokemon->pokemonId].variantStatus,
             POKEMON_NAME_POSITION.x, POKEMON_NAME_POSITION.y);
     }
 
