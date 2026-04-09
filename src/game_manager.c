@@ -114,13 +114,6 @@ void GameManagerInit(GameManager *manager, const char *filePath)
 
 void GameManagerUpdate(GameManager *manager)
 {
-    CheckForPokedexOpen(manager);
-
-    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
-    {
-        PokedexGUIUpdate(manager->pokedexGUI);
-        return;
-    }
     // Record keystrokes
     GameStateRecordKeyStroke(manager->gameState);
     DialogBoxClearAndUpdateText(manager->numKsDialog,
@@ -169,6 +162,17 @@ void GameManagerUpdate(GameManager *manager)
     else if (manager->currentState == GAME_MANAGER_STATE_THROWING_POKEBALL)
     {
         ThrowPokeballPhaseUpdate(manager);
+    }
+}
+
+void GameManagerUpdateGUI(GameManager *manager)
+{
+    CheckForPokedexOpen(manager);
+
+    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
+    {
+        PokedexGUIUpdate(manager->pokedexGUI);
+        return;
     }
 }
 

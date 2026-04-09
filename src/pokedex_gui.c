@@ -20,9 +20,9 @@
 static Font *font = NULL;
 
 static void DrawFrame();
-static void DrawNames(PokedexGUI *gui, Pokedex *pokedex);
-static void DrawPokemon(PokedexGUI *gui, Pokedex *pokedex);
-static void DrawIndicators(PokedexGUI *gui, Pokedex *pokedex);
+static void DrawNames(PokedexGUI *gui);
+static void DrawPokemon(PokedexGUI *gui);
+static void DrawIndicators(PokedexGUI *gui);
 
 void PokedexGUIInit(PokedexGUI *gui, Pokedex *pokedex, PokemonSpriteSheet *sheet, PkmnBattleSpriteSheet *battleSheet)
 {
@@ -81,9 +81,9 @@ void PokedexGUIUpdate(PokedexGUI *gui)
 void PokedexGUIDraw(PokedexGUI *gui)
 {
     DrawFrame();
-    DrawNames(gui, gui->pokedex);
-    DrawPokemon(gui, gui->pokedex);
-    DrawIndicators(gui, gui->pokedex);
+    DrawNames(gui);
+    DrawPokemon(gui);
+    DrawIndicators(gui);
 }
 
 static void DrawLight(Color color, Vector2 pos, int rad)
@@ -170,7 +170,7 @@ static void DrawFrame()
     DrawTextEx(*font, "ARROW KEYS to navigate", (Vector2){POKEDEX_WINDOW_WIDTH - 230, 15}, 12.0f, 2.0f, POKEDEX_COLOR_DARK_RED);
 }
 
-static void DrawNames(PokedexGUI *gui, Pokedex *pokedex)
+static void DrawNames(PokedexGUI *gui)
 {
     int x = POKEDEX_MAIN_SCREEN_X + POKEDEX_MAIN_SCREEN_WIDTH * 0.3f;
     int y = POKEDEX_MAIN_SCREEN_Y + 10;
@@ -192,7 +192,7 @@ static void DrawNames(PokedexGUI *gui, Pokedex *pokedex)
         bool isSeen = false;
         for (int j = 0; j < VARIANT_COUNT; j++)
         {
-            if (pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_SEEN || pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_REGISTERED)
+            if (gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_SEEN || gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_REGISTERED)
             {
                 isSeen = true;
                 break;
@@ -219,7 +219,7 @@ static void DrawNames(PokedexGUI *gui, Pokedex *pokedex)
     }
 }
 
-static void DrawPokemon(PokedexGUI *gui, Pokedex *pokedex)
+static void DrawPokemon(PokedexGUI *gui)
 {
     int pkmnIndex = gui->page * POKEDEX_PAGE_SIZE + gui->selectedPkmnIndex;
     int x = POKEDEX_MAIN_SCREEN_X + 20;
@@ -230,12 +230,12 @@ static void DrawPokemon(PokedexGUI *gui, Pokedex *pokedex)
     for (int j = 0; j < VARIANT_COUNT; j++)
     {
         int pkmnY = y + j * (PKMN_HEIGHT * scale + margin);
-        if (pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_NEVER_SEEN)
+        if (gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_NEVER_SEEN)
         {
             DrawRectangle(x, pkmnY, PKMN_WIDTH * scale, PKMN_HEIGHT * scale, GRAY);
             DrawText("???", x + (PKMN_WIDTH * scale - MeasureText("???", 20)) / 2, pkmnY + (PKMN_HEIGHT * scale - 20) / 2, 20, BLACK);
         }
-        else if (pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_SEEN)
+        else if (gui->pokedex->registered[pkmnIndex * VARIANT_COUNT + j] == POKEDEX_SEEN)
         {
             PkmnSpriteSheetDrawPro(gui->sheet, pkmnIndex, j, (Vector2){x, pkmnY}, scale, false, DARKGRAY);
         }
@@ -248,10 +248,11 @@ static void DrawPokemon(PokedexGUI *gui, Pokedex *pokedex)
     }
 }
 
-static void DrawIndicators(PokedexGUI *gui, Pokedex *pokedex)
+static void DrawIndicators(PokedexGUI *gui)
 {
     int x = 40;
     int y = 485;
+    Pokedex *pokedex = gui->pokedex;
 
     DrawText(
         TextFormat("Page: %d / %d", gui->page + 1, (POKEMON_COUNT + POKEDEX_PAGE_SIZE - 1) / POKEDEX_PAGE_SIZE),

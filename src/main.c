@@ -24,7 +24,7 @@ int main()
 	InitWindow(256, 256, "PokeStroke");
 	SetWindowState(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TOPMOST);
 
-	SetTargetFPS(30);
+	SetTargetFPS(60);
 
 	InitBackgroundInput();
 
@@ -54,7 +54,9 @@ int main()
 			TraceLog(LOG_INFO, "Quitting game", key);
 			break;
 		}
+
 		WindowDraggerUpdate();
+		GameManagerUpdateGUI(manager);
 
 		BeginDrawing();
 		ClearBackground(BLANK);

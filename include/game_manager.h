@@ -82,6 +82,7 @@ typedef struct
 
 void GameManagerInit(GameManager *manager, const char *filePath);
 void GameManagerUpdate(GameManager *manager);
+void GameManagerUpdateGUI(GameManager *manager);
 void GameManagerDraw(const GameManager *manager);
 void GameManagerUnload(GameManager *manager);
 
