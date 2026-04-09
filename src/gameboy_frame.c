@@ -69,7 +69,7 @@ Rectangle GameBoyFrameDraw(int size)
 
     // Batttery LED indicator
     DrawCircle(screenBorderX + 8, screenBorderY + screenBorderHeight / 2, 4, (Color){255, 0, 0, 255});
-    DrawCircleGradient(screenBorderX + 8, screenBorderY + screenBorderHeight / 2, 5, (Color){255, 0, 0, 255}, (Color){255, 0, 0, 100});
+    DrawCircleGradient((Vector2){screenBorderX + 8, screenBorderY + screenBorderHeight / 2}, 5, (Color){255, 0, 0, 255}, (Color){255, 0, 0, 100});
 
     // Screen
     int screenX = screenBorderX + screenBorderWidth * 0.15f;
