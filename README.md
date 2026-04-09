@@ -4,7 +4,7 @@
 
 **Catch Pokémon while you work. Every keystroke matters.**
 
-Keydex is a lightweight desktop **overlay game** that lives on top of whatever you’re doing.  
+PokeStroke is a lightweight desktop **overlay game** that lives on top of whatever you’re doing.  
 As you type, Pokémon spawn. As you keep working, Poké Balls fly.  
 Type faster → play faster → catch them all.
 
@@ -42,7 +42,7 @@ There is **no active input** beyond typing — the game rewards flow and focus.
 
 Not all Pokémon are the same. Every encounter may surprise you.
 
-Keydex features **three Pokémon variants**, and **you must catch them all**:
+Pokestroke features **three Pokémon variants**, and **you must catch them all**:
 
 ### 🔹 Regular
 
