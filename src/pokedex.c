@@ -531,10 +531,9 @@ void PokedexSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned short varian
         return;
     }
 
-    unsigned int index = pokemonId * VARIANT_COUNT + variant;
-    if (pokedex->registered[index].variantStatus[variant] == POKEDEX_NEVER_SEEN)
+    if (pokedex->registered[pokemonId].variantStatus[variant] == POKEDEX_NEVER_SEEN)
     {
-        pokedex->registered[index].variantStatus[variant] = POKEDEX_SEEN;
+        pokedex->registered[pokemonId].variantStatus[variant] = POKEDEX_SEEN;
     }
 }
 
@@ -543,9 +542,8 @@ void PokedexRegister(Pokedex *pokedex, unsigned int pokemonId, unsigned short va
     if (pokemonId >= POKEMON_COUNT || variant >= VARIANT_COUNT)
         return;
 
-    unsigned int index = pokemonId * VARIANT_COUNT + variant;
-    pokedex->registered[index].variantStatus[variant] = POKEDEX_REGISTERED;
-    pokedex->registered[index].caughtCount[variant]++;
+    pokedex->registered[pokemonId].variantStatus[variant] = POKEDEX_REGISTERED;
+    pokedex->registered[pokemonId].caughtCount[variant]++;
 }
 
 void PokedexUnload(Pokedex *pokedex)
