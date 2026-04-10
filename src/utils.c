@@ -29,7 +29,7 @@ unsigned int SampleFromWeightedDistribution(const unsigned short *weights, unsig
 void SafeSetWindowSize(int width, int height)
 {
     // Get the scaling factor (e.g., 1.5 for 150% scaling)
-    Vector2 dpi = GetWindowScaleDPI();
+    Vector2 dpi = {1.0f, 1.0f}; // GetWindowScaleDPI();
 
     // Adjust the requested size by the DPI factor
     int finalWidth = (int)(width * dpi.x);

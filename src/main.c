@@ -24,6 +24,9 @@ int main()
 	InitWindow(256, 256, "PokeStroke");
 	SetWindowState(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TOPMOST);
 
+	// Font texture
+	SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_POINT);
+
 	SetTargetFPS(60);
 
 	InitBackgroundInput();
@@ -58,11 +61,24 @@ int main()
 		WindowDraggerUpdate();
 		GameManagerUpdateGUI(manager);
 
-		BeginDrawing();
+		RenderTexture2D target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+
+		SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
+		BeginTextureMode(target);
 		ClearBackground(BLANK);
 		GameBoyFrameDraw(256);
 		GameManagerDraw(manager);
+		EndTextureMode();
+
+		BeginDrawing();
+		ClearBackground(BLANK);
+		DrawTexturePro(
+			target.texture,
+			(Rectangle){0.0f, 0.0f, (float)target.texture.width, (float)-(target.texture.height)},
+			(Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()}, (Vector2){0, 0},
+			0.0f, WHITE);
 		EndDrawing();
+		UnloadRenderTexture(target);
 	}
 
 	GameBoyFrameUnload();
