@@ -24,6 +24,15 @@ typedef struct
 void PokedexInit(Pokedex *pokedex);
 void PokedexSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned short variant);
 void PokedexRegister(Pokedex *pokedex, unsigned int pokemonId, unsigned short variant);
+
+// Stats
+unsigned int PokedexNumRegistered(Pokedex *pokedex, unsigned char variant);
+unsigned char PokedexIsNeverSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant);
+unsigned char PokedexIsSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant);
+unsigned char PokedexAnyVariantSeen(Pokedex *pokedex, unsigned int pokemonId);
+unsigned char PokedexIsRegistered(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant);
+unsigned long long PokedexGetCaughtCount(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant);
+
 void PokedexUnload(Pokedex *pokedex);
 
 #endif // POKEDEX_H

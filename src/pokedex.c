@@ -546,6 +546,77 @@ void PokedexRegister(Pokedex *pokedex, unsigned int pokemonId, unsigned short va
     pokedex->registered[pokemonId].caughtCount[variant]++;
 }
 
+unsigned int PokedexNumRegistered(Pokedex *pokedex, unsigned char variant)
+{
+    if (variant >= VARIANT_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid variant in PokedexNumRegistered: variant=%u", variant);
+        return 0;
+    }
+    unsigned int total = 0;
+    for (unsigned int i = 0; i < POKEMON_COUNT; i++)
+    {
+        total += PokedexIsRegistered(pokedex, i, variant);
+    }
+    return total;
+}
+
+unsigned char PokedexIsSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant)
+{
+    if (pokemonId >= POKEMON_COUNT || variant >= VARIANT_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid pokemonId or variant in PokedexIsSeen: pokemonId=%u, variant=%u", pokemonId, variant);
+        return 0;
+    }
+    return pokedex->registered[pokemonId].variantStatus[variant] >= POKEDEX_SEEN;
+}
+
+unsigned char PokedexIsNeverSeen(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant)
+{
+    if (pokemonId >= POKEMON_COUNT || variant >= VARIANT_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid pokemonId or variant in PokedexIsNeverSeen: pokemonId=%u, variant=%u", pokemonId, variant);
+        return 0;
+    }
+    return pokedex->registered[pokemonId].variantStatus[variant] == POKEDEX_NEVER_SEEN;
+}
+
+unsigned char PokedexAnyVariantSeen(Pokedex *pokedex, unsigned int pokemonId)
+{
+    if (pokemonId >= POKEMON_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid pokemonId in PokedexAnyVariantSeen: pokemonId=%u", pokemonId);
+        return 0;
+    }
+    for (unsigned char variant = 0; variant < VARIANT_COUNT; variant++)
+    {
+        if (PokedexIsSeen(pokedex, pokemonId, variant))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+unsigned char PokedexIsRegistered(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant)
+{
+    if (pokemonId >= POKEMON_COUNT || variant >= VARIANT_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid pokemonId or variant in PokedexIsRegistered: pokemonId=%u, variant=%u", pokemonId, variant);
+        return 0;
+    }
+    return pokedex->registered[pokemonId].variantStatus[variant] == POKEDEX_REGISTERED;
+}
+
+unsigned long long PokedexGetCaughtCount(Pokedex *pokedex, unsigned int pokemonId, unsigned char variant)
+{
+    if (pokemonId >= POKEMON_COUNT || variant >= VARIANT_COUNT)
+    {
+        TraceLog(LOG_ERROR, "Invalid pokemonId or variant in PokedexGetCaughtCount: pokemonId=%u, variant=%u", pokemonId, variant);
+        return 0;
+    }
+    return pokedex->registered[pokemonId].caughtCount[variant];
+}
 void PokedexUnload(Pokedex *pokedex)
 {
 }
