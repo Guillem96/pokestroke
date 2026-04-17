@@ -14,13 +14,14 @@ typedef struct GameState
     unsigned long long *keyStrokesByDay;
     Pokedex *pokedex;
     time_t startTime;
+    char checkpointPath[256];
 } GameState;
 
 void GameStateInit(GameState *state, const char *filePath);
 void GameStateRecordKeyStroke(GameState *state);
 unsigned long long GameStateGetTotalKeyStrokes(const GameState *state);
 unsigned int GameStateGetNumDays(const GameState *state);
-void GameStateSave(const GameState *state, const char *filePath);
+void GameStateSave(const GameState *state);
 void GameStateUnload(GameState *state);
 
 #endif // GAME_STATE_H

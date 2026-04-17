@@ -1,9 +1,11 @@
 #include "game_state.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "raylib.h"
 #include "pokedex.h"
+#include "utils.h"
 
 #define SECOND_IN_DAY 86400
 
@@ -13,6 +15,7 @@ static void LogGameState(const GameState *state);
 
 void GameStateInit(GameState *state, const char *filePath)
 {
+    strcpy(state->checkpointPath, filePath);
     FILE *file = fopen(filePath, "rb");
     if (file == NULL)
     {
@@ -30,6 +33,7 @@ void GameStateRecordKeyStroke(GameState *state)
     time_t now = time(NULL);
     double secondsSinceStart = difftime(now, state->startTime);
     unsigned int dayIndex = (unsigned int)(secondsSinceStart / SECOND_IN_DAY);
+
     if (dayIndex < state->currentCapacity)
     {
         state->keyStrokesByDay[dayIndex]++;
@@ -74,22 +78,25 @@ unsigned long long GameStateGetTotalKeyStrokes(const GameState *state)
 
 unsigned int GameStateGetNumDays(const GameState *state)
 {
+    unsigned int numDays = 0;
+
     for (unsigned int i = 0; i < state->currentCapacity; i++)
     {
-        if (state->keyStrokesByDay[i] == NO_DAY_DATA)
+        if (state->keyStrokesByDay[i] != NO_DAY_DATA)
         {
-            return i;
+            numDays = max(numDays, i + 1);
         }
     }
-    return state->currentCapacity;
+    return numDays;
 }
 
-void GameStateSave(const GameState *state, const char *filePath)
+void GameStateSave(const GameState *state)
 {
-    FILE *file = fopen(filePath, "wb");
+    TraceLog(LOG_INFO, "Saving game state to %s...", state->checkpointPath);
+    FILE *file = fopen(state->checkpointPath, "wb");
     if (file == NULL)
     {
-        TraceLog(LOG_ERROR, "Error opening file for writing: %s\n", filePath);
+        TraceLog(LOG_ERROR, "Error opening file for writing: %s\n", state->checkpointPath);
         return;
     }
 
@@ -119,10 +126,20 @@ static void InitializeGameStateFromFile(FILE *file, GameState *state)
 {
     fread(&state->currentCapacity, sizeof(unsigned int), 1, file);
     state->keyStrokesByDay = malloc(sizeof(unsigned long long) * state->currentCapacity);
+    if (state->keyStrokesByDay == NULL)
+    {
+        TraceLog(LOG_ERROR, "Error allocating memory for keyStrokesByDay\n");
+        exit(1);
+    }
     fread(state->keyStrokesByDay, sizeof(unsigned long long), state->currentCapacity, file);
     fread(&state->startTime, sizeof(time_t), 1, file);
 
     state->pokedex = malloc(sizeof(Pokedex));
+    if (state->pokedex == NULL)
+    {
+        TraceLog(LOG_ERROR, "Error allocating memory for pokedex\n");
+        exit(1);
+    }
     PokedexInit(state->pokedex);
 
     unsigned short pokedexVersionMarker;
@@ -171,7 +188,14 @@ static inline void LogGameState(const GameState *state)
     printf("  keyStrokesByDay: [");
     for (unsigned int i = 0; i < GameStateGetNumDays(state); i++)
     {
-        printf("%llu", state->keyStrokesByDay[i]);
+        if (state->keyStrokesByDay[i] == NO_DAY_DATA)
+        {
+            printf("0");
+        }
+        else
+        {
+            printf("%llu", state->keyStrokesByDay[i]);
+        }
         if (i < GameStateGetNumDays(state) - 1)
             printf(", ");
     }

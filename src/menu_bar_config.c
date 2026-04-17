@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "raylib.h"
+#include "trainer_card_gui.h"
 
 #if defined(__clang__)
 #include <libc.h>
@@ -30,25 +31,35 @@
 #include "pokedex_gui.h"
 #include "utils.h"
 
+#define TRAY_POKEDEX_ITEM_INDEX 0
+#define TRAY_TRAINER_CARD_ITEM_INDEX 1
+#define TRAY_BATTLE_ITEM_INDEX 2
+
 MenuBarConfig g_menuBarConfig = {
     .showPokedex = 0,
+    .showTrainerCard = 0,
     .showConfig = 0,
     .minimizedView = 1,
     .shouldQuit = 0,
 };
 
 static void toggle_pokedex_cb(struct tray_menu_item *item);
+static void toggle_trainer_card_cb(struct tray_menu_item *item);
+static void toggle_battle_cb(struct tray_menu_item *item);
 static void toggle_minimized_view_cb(struct tray_menu_item *item);
 static void quit_cb(struct tray_menu_item *item);
 static void move_window_cb(struct tray_menu_item *item);
+static void update_checked_states();
 
-// Test tray init
 struct tray tray = {
     .icon_filepath = TRAY_ICON,
     .tooltip = "PokeStroke",
     .menu =
         (struct tray_menu_item[]){
-            {.text = "Show Pokedex", .checked = 0, .cb = toggle_pokedex_cb},
+            {.text = "Pokedex", .checked = 0, .cb = toggle_pokedex_cb},
+            {.text = "Trainer Card", .checked = 0, .cb = toggle_trainer_card_cb},
+            {.text = "Battle", .disabled = 1, .checked = 1, .cb = toggle_battle_cb},
+            {.text = "-"},
             {.text = "Minimized View", .checked = 1, .cb = toggle_minimized_view_cb},
             {.text = "-"},
             {.text = "Window Position",
@@ -66,34 +77,48 @@ struct tray tray = {
 
 void toggle_pokedex_cb(struct tray_menu_item *item)
 {
-    item->checked = !item->checked;
-    g_menuBarConfig.showPokedex = item->checked;
+    g_menuBarConfig.showPokedex = 1;
+    g_menuBarConfig.showTrainerCard = 0;
 
-    if (!g_menuBarConfig.showPokedex)
-    {
-        SafeSetWindowSize(256, 256);
-    }
-    else
-    {
-        Vector2 winPos = GetWindowPosition();
-        Vector2 screenSize = (Vector2){GetScreenWidth(), GetScreenHeight()};
-        Vector2 monitorSize = (Vector2){GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())};
-        Vector2 newPos = {
-            clamp(winPos.x - (POKEDEX_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - POKEDEX_WINDOW_WIDTH),
-            clamp(winPos.y, -(POKEDEX_WINDOW_HEIGHT + screenSize.y), monitorSize.y - POKEDEX_WINDOW_HEIGHT)};
+    Vector2 winPos = GetWindowPosition();
+    Vector2 screenSize = (Vector2){GetScreenWidth(), GetScreenHeight()};
+    Vector2 monitorSize = (Vector2){GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())};
+    Vector2 newPos = {
+        clamp(winPos.x - (POKEDEX_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - POKEDEX_WINDOW_WIDTH),
+        clamp(winPos.y, -(POKEDEX_WINDOW_HEIGHT + screenSize.y), monitorSize.y - POKEDEX_WINDOW_HEIGHT)};
 
-        SafeSetWindowSize(POKEDEX_WINDOW_WIDTH, POKEDEX_WINDOW_HEIGHT);
-        SetWindowPosition(newPos.x, newPos.y);
-    }
+    SafeSetWindowSize(POKEDEX_WINDOW_WIDTH, POKEDEX_WINDOW_HEIGHT);
+    SetWindowPosition(newPos.x, newPos.y);
+    update_checked_states();
+}
 
-    struct tray *ct = tray_get_instance();
-    if (ct != NULL)
-        tray_update(ct);
+static void toggle_battle_cb(struct tray_menu_item *item)
+{
+    g_menuBarConfig.showPokedex = 0;
+    g_menuBarConfig.showTrainerCard = 0;
+    SafeSetWindowSize(256, 256);
+    update_checked_states();
+}
+
+void toggle_trainer_card_cb(struct tray_menu_item *item)
+{
+    g_menuBarConfig.showPokedex = 0;
+    g_menuBarConfig.showTrainerCard = 1;
+    update_checked_states();
+
+    Vector2 winPos = GetWindowPosition();
+    Vector2 screenSize = (Vector2){GetScreenWidth(), GetScreenHeight()};
+    Vector2 monitorSize = (Vector2){GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())};
+    Vector2 newPos = {
+        clamp(winPos.x - (TRAINER_CARD_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - TRAINER_CARD_WINDOW_WIDTH),
+        clamp(winPos.y, -(TRAINER_CARD_WINDOW_HEIGHT + screenSize.y), monitorSize.y - TRAINER_CARD_WINDOW_HEIGHT)};
+
+    SafeSetWindowSize(TRAINER_CARD_WINDOW_WIDTH, TRAINER_CARD_WINDOW_HEIGHT);
+    SetWindowPosition(newPos.x, newPos.y);
 }
 
 void toggle_minimized_view_cb(struct tray_menu_item *item)
 {
-    printf("toggle minimized view cb\n");
     item->checked = !item->checked;
     g_menuBarConfig.minimizedView = item->checked;
     struct tray *ct = tray_get_instance();
@@ -142,4 +167,23 @@ void MenuBarConfigUpdate()
 void MenuBarConfigUnload()
 {
     tray_exit();
+}
+
+static void update_checked_states()
+{
+    struct tray *ct = tray_get_instance();
+    if (ct == NULL)
+    {
+        TraceLog(LOG_ERROR, "Tray instance is NULL");
+        return;
+    }
+
+    ct->menu[TRAY_POKEDEX_ITEM_INDEX].checked = g_menuBarConfig.showPokedex;
+    ct->menu[TRAY_POKEDEX_ITEM_INDEX].disabled = g_menuBarConfig.showPokedex;
+    ct->menu[TRAY_TRAINER_CARD_ITEM_INDEX].checked = g_menuBarConfig.showTrainerCard;
+    ct->menu[TRAY_TRAINER_CARD_ITEM_INDEX].disabled = g_menuBarConfig.showTrainerCard;
+
+    ct->menu[TRAY_BATTLE_ITEM_INDEX].checked = !g_menuBarConfig.showPokedex && !g_menuBarConfig.showTrainerCard;
+    ct->menu[TRAY_BATTLE_ITEM_INDEX].disabled = !g_menuBarConfig.showPokedex && !g_menuBarConfig.showTrainerCard;
+    tray_update(ct);
 }

@@ -6,14 +6,11 @@
 
 #include "menu_bar_config.h"
 #include "game_state.h"
-#include "pokedex.h"
-#include "pokedex_gui.h"
-#include "pkmn_sprite_sheet.h"
-#include "pkmn_battle_sprite_sheet.h"
 #include "pokeball_anim.h"
 #include "pkmn_spawn_anim.h"
 #include "dialog_box.h"
 #include "utils.h"
+#include "ribbons.h"
 
 // "Business" logic functions
 static void SpawnRandomPokemon(GameManager *manager);
@@ -43,45 +40,12 @@ static void CatchFailurePhaseUpdate(GameManager *manager);
 
 // Helpers
 static void ClearContextForNextRound(GameManager *manager, unsigned short clearSpawnedPokemon, unsigned short clearCatchResult);
-static void CheckForPokedexOpen(GameManager *manager);
-static const char *FormatNumber(unsigned long long n);
 
-void GameManagerInit(GameManager *manager, const char *filePath)
+void GameManagerInit(GameManager *manager, GameState *gameState, PokemonSpriteSheet *sheet, PkmnBattleSpriteSheet *battleSheet)
 {
-    SetRandomSeed((unsigned int)time(NULL));
-    srand((unsigned int)time(NULL));
-
-    strcpy(manager->checkpoint, filePath);
-
-    manager->gameState = (GameState *)malloc(sizeof(GameState));
-    if (manager->gameState == NULL)
-    {
-        TraceLog(LOG_ERROR, "Failed to allocate memory for GameState.\n");
-        exit(1);
-    }
-
-    // Initialize sprites
-    manager->sheet = (PokemonSpriteSheet *)malloc(sizeof(PokemonSpriteSheet));
-    if (manager->sheet == NULL)
-    {
-        TraceLog(LOG_ERROR, "Failed to allocate memory for PokemonSpriteSheet.\n");
-        exit(1);
-    }
-
-    manager->battleSheet = (PkmnBattleSpriteSheet *)malloc(sizeof(PkmnBattleSpriteSheet));
-    if (manager->battleSheet == NULL)
-    {
-        TraceLog(LOG_ERROR, "Failed to allocate memory for PkmnBattleSpriteSheet.\n");
-        exit(1);
-    }
-
-    PkmnSpriteSheetInit(manager->sheet, "pokedex.png");
-    PkmnBattleSpriteSheetInit(manager->battleSheet, "battle.png");
-
-    GameStateInit(manager->gameState, filePath);
-
-    manager->pokedexGUI = (PokedexGUI *)malloc(sizeof(PokedexGUI));
-    PokedexGUIInit(manager->pokedexGUI, manager->gameState->pokedex, manager->sheet, manager->battleSheet);
+    manager->gameState = gameState;
+    manager->sheet = sheet;
+    manager->battleSheet = battleSheet;
 
     manager->pokeballAnim = NULL;
     manager->spawnAnim = NULL;
@@ -97,7 +61,7 @@ void GameManagerInit(GameManager *manager, const char *filePath)
         TraceLog(LOG_ERROR, "Failed to allocate memory for DialogBox.\n");
         exit(1);
     }
-    DialogBoxInit(manager->bottomDialog, "", 0.5, (Rectangle){55, 175, 145, 35}, false);
+    DialogBoxInit(manager->bottomDialog, "", 0.5, (Rectangle){55, 175, 145, 35}, 13, 2, false);
 
     manager->numKsDialog = (DialogBox *)malloc(sizeof(DialogBox));
     if (manager->numKsDialog == NULL)
@@ -105,10 +69,9 @@ void GameManagerInit(GameManager *manager, const char *filePath)
         TraceLog(LOG_ERROR, "Failed to allocate memory for numKsDialog DialogBox.\n");
         exit(1);
     }
-    DialogBoxInit(manager->numKsDialog, "", 0, (Rectangle){55, 153, 90, 18}, true);
+    DialogBoxInit(manager->numKsDialog, "", 0, (Rectangle){55, 153, 90, 18}, 13, 2, true);
 
     manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
-
     manager->prevStateBeforePokedex = GAME_MANAGER_STATE_SPAWN_POKEMON;
 }
 
@@ -165,24 +128,8 @@ void GameManagerUpdate(GameManager *manager)
     }
 }
 
-void GameManagerUpdateGUI(GameManager *manager)
-{
-    CheckForPokedexOpen(manager);
-
-    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
-    {
-        PokedexGUIUpdate(manager->pokedexGUI);
-        return;
-    }
-}
-
 void GameManagerDraw(const GameManager *manager)
 {
-    if (manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX || g_menuBarConfig.showPokedex)
-    {
-        PokedexGUIDraw(manager->pokedexGUI);
-        return;
-    }
 
     if (manager->currentState == GAME_MANAGER_STATE_SPAWN_POKEMON)
     {
@@ -216,31 +163,19 @@ void GameManagerDraw(const GameManager *manager)
             POKEBALL_STATUS_IDLE,
             POKEMON_POSITION.x + PKMN_WIDTH / 2 - POKEBALL_SIZE / 2, POKEMON_POSITION.y + PKMN_HEIGHT - POKEBALL_SIZE);
     }
-
     DialogBoxDraw(manager->bottomDialog);
     DialogBoxDraw(manager->numKsDialog);
 }
 
 void GameManagerUnload(GameManager *manager)
 {
-    printf("Unloading game manager and saving state to %s\n", manager->checkpoint);
-    GameStateSave(manager->gameState, manager->checkpoint);
-    GameStateUnload(manager->gameState);
-    free(manager->gameState);
-
-    PkmnSpriteSheetUnload(manager->sheet);
-    free(manager->sheet);
-
-    PkmnBattleSpriteSheetUnload(manager->battleSheet);
-    free(manager->battleSheet);
+    GameStateSave(manager->gameState);
 
     DialogBoxUnload(manager->bottomDialog);
     free(manager->bottomDialog);
 
     DialogBoxUnload(manager->numKsDialog);
     free(manager->numKsDialog);
-
-    free(manager->pokedexGUI);
 
     if (manager->spawnedPokemon != NULL)
     {
@@ -279,11 +214,13 @@ static void SpawnRandomPokemon(GameManager *manager)
     unsigned int pokemonId = SampleFromWeightedDistribution(POKEMON_SPAWN_WEIGHTS, POKEMON_COUNT);
     float variantRoll = (float)rand() / (float)RAND_MAX;
     unsigned short variant;
-    if (variantRoll < PKMN_BW_PROBABILITY)
+    bool shinyCharmMultiplier = RibbonShinyCharmAvailable(manager->gameState) ? 2 : 1;
+
+    if (variantRoll < PKMN_BW_PROBABILITY * shinyCharmMultiplier)
     {
         variant = PKMN_VARIANT_BW;
     }
-    else if (variantRoll < PKMN_SHINY_PROBABILITY)
+    else if (variantRoll < PKMN_SHINY_PROBABILITY * shinyCharmMultiplier)
     {
         variant = PKMN_VARIANT_SHINY;
     }
@@ -545,7 +482,7 @@ static void FinalizeCatchFailureState(GameManager *manager)
 static void FinalizePokedexRegisterState(GameManager *manager)
 {
     PokedexRegister(manager->gameState->pokedex, manager->spawnedPokemon->pokemonId, manager->spawnedPokemon->variant);
-    GameStateSave(manager->gameState, manager->checkpoint);
+    GameStateSave(manager->gameState);
     manager->currentState = GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT;
 }
 
@@ -553,51 +490,4 @@ static void FinalizePokemonFleeState(GameManager *manager)
 {
     ClearContextForNextRound(manager, 1, 1);
     manager->currentState = GAME_MANAGER_STATE_SPAWN_POKEMON;
-}
-
-static void CheckForPokedexOpen(GameManager *manager)
-{
-    if (g_menuBarConfig.showPokedex && manager->currentState != GAME_MANAGER_STATE_SHOW_POKEDEX)
-    {
-        manager->prevStateBeforePokedex = manager->currentState;
-        manager->currentState = GAME_MANAGER_STATE_SHOW_POKEDEX;
-        return;
-    }
-
-    if (!g_menuBarConfig.showPokedex && manager->currentState == GAME_MANAGER_STATE_SHOW_POKEDEX)
-    {
-        manager->currentState = manager->prevStateBeforePokedex;
-        return;
-    }
-}
-
-static const char *FormatNumber(unsigned long long n)
-{
-    static char buffer[32];
-    char temp[32];
-    int res = sprintf(temp, "%llu", n);
-
-    int count = 0;
-    int dest = 0;
-
-    for (int i = res - 1; i >= 0; i--)
-    {
-        if (count > 0 && count % 3 == 0)
-        {
-            buffer[dest++] = '.';
-        }
-        buffer[dest++] = temp[i];
-        count++;
-    }
-    buffer[dest] = '\0';
-
-    // Reverse the string back
-    for (int i = 0; i < dest / 2; i++)
-    {
-        char t = buffer[i];
-        buffer[i] = buffer[dest - i - 1];
-        buffer[dest - i - 1] = t;
-    }
-
-    return buffer;
 }

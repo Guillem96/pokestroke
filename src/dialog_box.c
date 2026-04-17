@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds, bool alignTextRight)
+void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds, unsigned int fontSize, unsigned int padding, bool alignTextRight)
 {
     strcpy(box->text, text);
     box->currentCharIndex = 0;
+    box->fontSize = fontSize;
+    box->padding = padding;
     box->totalChars = strlen(text);
     box->alignTextRight = alignTextRight;
     box->framesPerChar = framesPerChar;
@@ -53,16 +55,16 @@ void DialogBoxDraw(const DialogBox *box)
     strcpy(ss, box->text);
     ss[box->currentCharIndex] = '\0';
 
-    DrawRectangleRounded((Rectangle){box->bounds.x - 2, box->bounds.y - 2, box->bounds.width + 4, box->bounds.height + 4}, 0.1f, 8, WHITE);
+    DrawRectangleRounded((Rectangle){box->bounds.x - box->padding, box->bounds.y - box->padding, box->bounds.width + box->padding * 2, box->bounds.height + box->padding * 2}, 0.1f, 8, WHITE);
     DrawRectangleRoundedLinesEx(box->bounds, 0.1f, 8, 2, BLACK);
 
     if (box->alignTextRight)
     {
-        int textSize = MeasureText(ss, 13);
-        DrawText(ss, box->bounds.x + box->bounds.width - textSize - 8, box->bounds.y + 4, 13, BLACK);
+        int textSize = MeasureText(ss, box->fontSize);
+        DrawText(ss, box->bounds.x + box->bounds.width - textSize - box->padding * 4, box->bounds.y + box->padding * 2, box->fontSize, BLACK);
         return;
     }
-    DrawText(ss, box->bounds.x + 8, box->bounds.y + 4, 13, BLACK);
+    DrawText(ss, box->bounds.x + box->padding * 4, box->bounds.y + box->padding * 2, box->fontSize, BLACK);
 }
 
 void DialogBoxUnload(DialogBox *box)

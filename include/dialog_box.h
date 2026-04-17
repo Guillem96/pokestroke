@@ -7,6 +7,8 @@ typedef struct
     char text[512];
     unsigned int currentCharIndex;
     unsigned int totalChars;
+    unsigned int fontSize;
+    unsigned int padding;
     float framesPerChar;
     float frameCounter;
     unsigned short isComplete;
@@ -14,7 +16,15 @@ typedef struct
     bool alignTextRight;
 } DialogBox;
 
-void DialogBoxInit(DialogBox *box, const char *text, float framesPerChar, Rectangle bounds, bool alignTextRight);
+void DialogBoxInit(
+    DialogBox *box,
+    const char *text,
+    float framesPerChar,
+    Rectangle bounds,
+    unsigned int fontSize,
+    unsigned int padding,
+    bool alignTextRight);
+
 void DialogBoxClearAndUpdateText(DialogBox *box, const char *text);
 void DialogBoxUpdate(DialogBox *box);
 void DialogBoxDraw(const DialogBox *box);

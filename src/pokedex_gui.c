@@ -189,15 +189,7 @@ static void DrawNames(PokedexGUI *gui)
             break;
         }
 
-        bool isSeen = false;
-        for (int j = 0; j < VARIANT_COUNT; j++)
-        {
-            if (gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_SEEN || gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_REGISTERED)
-            {
-                isSeen = true;
-                break;
-            }
-        }
+        bool isSeen = PokedexAnyVariantSeen(gui->pokedex, pkmnIndex);
 
         int nameX = x + 10;
         int nameMargin = 12;
@@ -230,12 +222,12 @@ static void DrawPokemon(PokedexGUI *gui)
     for (int j = 0; j < VARIANT_COUNT; j++)
     {
         int pkmnY = y + j * (PKMN_HEIGHT * scale + margin);
-        if (gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_NEVER_SEEN)
+        if (PokedexIsNeverSeen(gui->pokedex, pkmnIndex, j))
         {
             DrawRectangle(x, pkmnY, PKMN_WIDTH * scale, PKMN_HEIGHT * scale, GRAY);
             DrawText("???", x + (PKMN_WIDTH * scale - MeasureText("???", 20)) / 2, pkmnY + (PKMN_HEIGHT * scale - 20) / 2, 20, BLACK);
         }
-        else if (gui->pokedex->registered[pkmnIndex].variantStatus[j] == POKEDEX_SEEN)
+        else if (PokedexIsSeen(gui->pokedex, pkmnIndex, j) && !PokedexIsRegistered(gui->pokedex, pkmnIndex, j))
         {
             PkmnSpriteSheetDrawPro(gui->sheet, pkmnIndex, j, (Vector2){x, pkmnY}, scale, false, DARKGRAY);
         }
@@ -243,13 +235,13 @@ static void DrawPokemon(PokedexGUI *gui)
         {
             PkmnSpriteSheetDrawPro(gui->sheet, pkmnIndex, j, (Vector2){x, pkmnY}, scale, false, WHITE);
 
-            const char *text = TextFormat("x%03llu", gui->pokedex->registered[pkmnIndex].caughtCount[j]);
+            const char *text = TextFormat("x%03llu", PokedexGetCaughtCount(gui->pokedex, pkmnIndex, j));
             int textWidth = MeasureText(text, 10);
             int rectangleWidth = textWidth + 10;
             DrawRectangle(
                 x + PKMN_WIDTH * scale - rectangleWidth, pkmnY, rectangleWidth, 16, (Color){248, 248, 248, 255});
             DrawText(
-                text, // gui->pokedex->registered[pkmnIndex].caughtCount[j]),
+                text,
                 x + PKMN_WIDTH * scale - rectangleWidth + 5,
                 pkmnY + 4, 10, BLACK);
             DrawRectangleLinesEx(
@@ -277,11 +269,11 @@ static void DrawIndicators(PokedexGUI *gui)
     int normalCaught = 0;
     for (int i = 0; i < POKEMON_COUNT; i++)
     {
-        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_REGULAR] == POKEDEX_SEEN)
+        if (PokedexIsSeen(pokedex, i, PKMN_VARIANT_REGULAR))
         {
             normalSeen++;
         }
-        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_REGULAR] == POKEDEX_REGISTERED)
+        if (PokedexIsRegistered(pokedex, i, PKMN_VARIANT_REGULAR))
         {
             normalCaught++;
             normalSeen++;
@@ -294,11 +286,11 @@ static void DrawIndicators(PokedexGUI *gui)
     int shinyCaught = 0;
     for (int i = 0; i < POKEMON_COUNT; i++)
     {
-        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_SHINY] == POKEDEX_SEEN)
+        if (PokedexIsSeen(pokedex, i, PKMN_VARIANT_SHINY))
         {
             shinySeen++;
         }
-        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_SHINY] == POKEDEX_REGISTERED)
+        if (PokedexIsRegistered(pokedex, i, PKMN_VARIANT_SHINY))
         {
             shinyCaught++;
             shinySeen++;
@@ -311,11 +303,11 @@ static void DrawIndicators(PokedexGUI *gui)
     int bwCaught = 0;
     for (int i = 0; i < POKEMON_COUNT; i++)
     {
-        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_BW] == POKEDEX_SEEN)
+        if (PokedexIsSeen(pokedex, i, PKMN_VARIANT_BW))
         {
             bwSeen++;
         }
-        if (pokedex->registered[i].variantStatus[PKMN_VARIANT_BW] == POKEDEX_REGISTERED)
+        if (PokedexIsRegistered(pokedex, i, PKMN_VARIANT_BW))
         {
             bwCaught++;
             bwSeen++;

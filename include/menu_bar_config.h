@@ -14,6 +14,7 @@
 typedef struct
 {
     int showPokedex;
+    int showTrainerCard;
     int showConfig;
     int shouldQuit;
     int minimizedView;
