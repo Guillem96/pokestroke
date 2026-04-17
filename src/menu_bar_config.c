@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "raylib.h"
+#include "trainer_card_gui.h"
 
 #if defined(__clang__)
 #include <libc.h>
@@ -105,15 +106,15 @@ void toggle_trainer_card_cb(struct tray_menu_item *item)
     g_menuBarConfig.showTrainerCard = 1;
     update_checked_states();
 
-    // Vector2 winPos = GetWindowPosition();
-    // Vector2 screenSize = (Vector2){GetScreenWidth(), GetScreenHeight()};
-    // Vector2 monitorSize = (Vector2){GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())};
-    // Vector2 newPos = {
-    //     clamp(winPos.x - (TRAINER_CARD_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - TRAINER_CARD_WINDOW_WIDTH),
-    //     clamp(winPos.y, -(TRAINER_CARD_WINDOW_HEIGHT + screenSize.y), monitorSize.y - TRAINER_CARD_WINDOW_HEIGHT)};
+    Vector2 winPos = GetWindowPosition();
+    Vector2 screenSize = (Vector2){GetScreenWidth(), GetScreenHeight()};
+    Vector2 monitorSize = (Vector2){GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())};
+    Vector2 newPos = {
+        clamp(winPos.x - (TRAINER_CARD_WINDOW_WIDTH - screenSize.x), 0, monitorSize.x - TRAINER_CARD_WINDOW_WIDTH),
+        clamp(winPos.y, -(TRAINER_CARD_WINDOW_HEIGHT + screenSize.y), monitorSize.y - TRAINER_CARD_WINDOW_HEIGHT)};
 
-    // SafeSetWindowSize(TRAINER_CARD_WINDOW_WIDTH, TRAINER_CARD_WINDOW_HEIGHT);
-    // SetWindowPosition(newPos.x, newPos.y);
+    SafeSetWindowSize(TRAINER_CARD_WINDOW_WIDTH, TRAINER_CARD_WINDOW_HEIGHT);
+    SetWindowPosition(newPos.x, newPos.y);
 }
 
 void toggle_minimized_view_cb(struct tray_menu_item *item)

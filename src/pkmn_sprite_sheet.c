@@ -41,6 +41,7 @@ void PkmnSpriteSheetDrawPro(PokemonSpriteSheet *sheet, int pokemon, unsigned sho
     }
 
     Rectangle destRec = {x, y, newWidth, newHeight};
+
     DrawTexturePro(sheet->texture, sourceRect, destRec, (Vector2){0, 0}, 0.0f, tint);
 }
 

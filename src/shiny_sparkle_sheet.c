@@ -21,7 +21,7 @@ void ShinySparkleSheetInit(ShinySparkleSheet *sheet, const char *filename)
     Color *pixels = (Color *)img.data;
     for (int i = 0; i < img.width * img.height; i++)
     {
-        if (pixels[i].r == 238 && pixels[i].g == 82 && pixels[i].b == 247)
+        if (pixels[i].r == 255 && pixels[i].g == 0 && pixels[i].b == 255)
         {
             pixels[i].a = 0;
         }

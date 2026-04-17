@@ -17,14 +17,13 @@ typedef struct
     unsigned int frameDuration;
     unsigned short loop;
     ShinySparkleSheet *sheet;
-    Vector2 position;
     unsigned int elapsedFrames;
     unsigned short isActive;
 } ShinySparkleAnim;
 
-void ShinySparkleAnimInit(ShinySparkleAnim *anim, Vector2 position, unsigned int frameDuration, unsigned short loop, ShinySparkleSheet *sheet);
+void ShinySparkleAnimInit(ShinySparkleAnim *anim, unsigned int frameDuration, unsigned short loop, ShinySparkleSheet *sheet);
 void ShinySparkleAnimUpdate(ShinySparkleAnim *anim);
-void ShinySparkleAnimDraw(ShinySparkleAnim *anim);
+void ShinySparkleAnimDraw(ShinySparkleAnim *anim, Vector2 position);
 void ShinySparkleAnimUnload(ShinySparkleAnim *anim);
 
 #endif

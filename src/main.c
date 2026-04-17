@@ -8,6 +8,14 @@
 #include "gameboy_frame.h"
 #include "window_dragger.h"
 #include "menu_bar_config.h"
+#include "trainer_card_gui.h"
+#include "ribbon_sheet.h"
+#include "shiny_sparkle_sheet.h"
+#include "pkmn_sprite_sheet.h"
+#include "pkmn_battle_sprite_sheet.h"
+#include "pokedex.h"
+#include "pokedex_gui.h"
+#include "shiny_charm_sheet.h"
 
 static const char *GetUserHomeDir(void);
 static const char *GetSaveFilePath(void);
@@ -16,6 +24,7 @@ static void SetupGameFilesystem(void);
 
 int main()
 {
+	SetTraceLogLevel(LOG_ERROR);
 	const char *saveFilePath = GetSaveFilePath();
 	SetupGameFilesystem();
 
@@ -24,22 +33,55 @@ int main()
 	InitWindow(256, 256, "PokeStroke");
 	SetWindowState(FLAG_WINDOW_UNDECORATED | FLAG_WINDOW_TOPMOST);
 
+	// Random seed
+	SetRandomSeed((unsigned int)time(NULL));
+	srand((unsigned int)time(NULL));
+
 	// Font texture
 	SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_POINT);
 
 	SetTargetFPS(60);
 
-	InitBackgroundInput();
+	// Screens
+	PokedexGUI pokedexGUI;
+	TrainerCardGUI tcg;
+	GameManager manager;
 
-	GameManager *manager = malloc(sizeof(GameManager));
-	GameManagerInit(manager, saveFilePath);
+	// Sheets
+	ShinySparkleSheet sparkleSheet;
+	RibbonSheet ribbonSheet;
+	ShinySparkleAnim sparkleAnim;
+	PokemonSpriteSheet pokemonSheet;
+	PkmnBattleSpriteSheet battleSheet;
+	ShinyCharmSheet shinyCharmSheet;
 
-	GameBoyFrameInit();
+	GameState gameState;
 
-	GameManagerUpdate(manager);
-
+	// Controls Init
 	WindowDraggerInit();
 	MenuBarConfigInit();
+	InitBackgroundInput();
+
+	// Savefile
+	GameStateInit(&gameState, saveFilePath);
+
+	// Trainer Card Init
+	ShinyCharmSheetInit(&shinyCharmSheet, "shiny-charm.png");
+	ShinySparkleSheetInit(&sparkleSheet, "shiny-sparkle.png");
+	RibbonSheetInit(&ribbonSheet, "ribbons.png");
+	TrainerCardGUIInit(&tcg, &ribbonSheet, &sparkleSheet, &shinyCharmSheet, &gameState);
+
+	// Pokedex Init
+	PkmnSpriteSheetInit(&pokemonSheet, "pokedex.png");
+	PkmnBattleSpriteSheetInit(&battleSheet, "battle.png");
+	PokedexGUIInit(&pokedexGUI, gameState.pokedex, &pokemonSheet, &battleSheet);
+
+	// Game Init
+	GameBoyFrameInit();
+	GameManagerInit(&manager, &gameState, &pokemonSheet, &battleSheet);
+	GameManagerUpdate(&manager); // Pre-run an update to initialize the first pokemon spawn
+
+	// TraceLog(LOG_INFO, "Initialization complete, entering main loop.");
 
 	while (!WindowShouldClose())
 	{
@@ -49,7 +91,7 @@ int main()
 
 		if (key != -1)
 		{
-			GameManagerUpdate(manager);
+			GameManagerUpdate(&manager);
 		}
 
 		if (GetKeyPressed() == KEY_ESCAPE || g_menuBarConfig.shouldQuit)
@@ -59,15 +101,33 @@ int main()
 		}
 
 		WindowDraggerUpdate();
-		GameManagerUpdateGUI(manager);
+
+		if (g_menuBarConfig.showPokedex)
+		{
+			PokedexGUIUpdate(&pokedexGUI);
+		}
+		else if (g_menuBarConfig.showTrainerCard)
+		{
+			TrainerCardGUIUpdate(&tcg);
+		}
 
 		RenderTexture2D target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-
 		SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
 		BeginTextureMode(target);
 		ClearBackground(BLANK);
-		GameBoyFrameDraw(256);
-		GameManagerDraw(manager);
+		if (!g_menuBarConfig.showTrainerCard && !g_menuBarConfig.showPokedex)
+		{
+			GameBoyFrameDraw(256);
+			GameManagerDraw(&manager);
+		}
+		else if (g_menuBarConfig.showTrainerCard)
+		{
+			TrainerCardGUIDraw(&tcg);
+		}
+		else if (g_menuBarConfig.showPokedex)
+		{
+			PokedexGUIDraw(&pokedexGUI);
+		}
 		EndTextureMode();
 
 		BeginDrawing();
@@ -81,10 +141,27 @@ int main()
 		UnloadRenderTexture(target);
 	}
 
+	// Sheets
+	ShinySparkleSheetUnload(&sparkleSheet);
+	RibbonSheetUnload(&ribbonSheet);
+	PkmnSpriteSheetUnload(&pokemonSheet);
+	PkmnBattleSpriteSheetUnload(&battleSheet);
+	ShinyCharmSheetUnload(&shinyCharmSheet);
 	GameBoyFrameUnload();
-	GameManagerUnload(manager);
+
+	// Screens
+	GameManagerUnload(&manager);
+	PokedexGUIUnload(&pokedexGUI);
+	TrainerCardGUIUnload(&tcg);
+
+	// Controls
 	MenuBarConfigUnload();
+
+	// Savefile
+	GameStateUnload(&gameState);
+
 	CloseWindow();
+
 	return 0;
 }
 

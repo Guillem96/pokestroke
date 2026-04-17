@@ -1,9 +1,8 @@
 #include "shiny_sparkle_anim.h"
 #include "shiny_sparkle_sheet.h"
 
-void ShinySparkleAnimInit(ShinySparkleAnim *anim, Vector2 position, unsigned int frameDuration, unsigned short loop, ShinySparkleSheet *sheet)
+void ShinySparkleAnimInit(ShinySparkleAnim *anim, unsigned int frameDuration, unsigned short loop, ShinySparkleSheet *sheet)
 {
-    anim->position = position;
     anim->frameDuration = frameDuration;
     anim->loop = loop;
     anim->sheet = sheet;
@@ -33,11 +32,11 @@ void ShinySparkleAnimUpdate(ShinySparkleAnim *anim)
     }
 }
 
-void ShinySparkleAnimDraw(ShinySparkleAnim *anim)
+void ShinySparkleAnimDraw(ShinySparkleAnim *anim, Vector2 position)
 {
     unsigned int framesPerState = anim->frameDuration / SHINY_SPARKLE_TOTAL_STATES;
     unsigned short currentState = anim->elapsedFrames / framesPerState;
-    ShinySparkleSheetDraw(anim->sheet, currentState);
+    ShinySparkleSheetDraw(anim->sheet, position, currentState);
 }
 
 void ShinySparkleAnimUnload(ShinySparkleAnim *anim)

@@ -7,7 +7,6 @@
 #include "pokeball_anim.h"
 #include "pkmn_spawn_anim.h"
 #include "dialog_box.h"
-#include "pokedex_gui.h"
 #include "pkmn_shrink_anim.h"
 #include "pkmn_grow_anim.h"
 
@@ -36,7 +35,6 @@
 #define GAME_MANAGER_STATE_CATCH_FAILURE 3
 #define GAME_MANAGER_STATE_POKEMON_FLEEING 4
 #define GAME_MANAGER_STATE_POKEMON_CAUGHT_WAIT 5
-#define GAME_MANAGER_STATE_SHOW_POKEDEX 6
 
 typedef struct
 {
@@ -54,10 +52,6 @@ typedef struct
 typedef struct
 {
     GameState *gameState;
-    char checkpoint[256];
-
-    // Extra GUIs
-    PokedexGUI *pokedexGUI;
 
     // Sprite sheets
     PokemonSpriteSheet *sheet;
@@ -80,9 +74,8 @@ typedef struct
     unsigned short prevStateBeforePokedex;
 } GameManager;
 
-void GameManagerInit(GameManager *manager, const char *filePath);
+void GameManagerInit(GameManager *manager, GameState *gameState, PokemonSpriteSheet *sheet, PkmnBattleSpriteSheet *battleSheet);
 void GameManagerUpdate(GameManager *manager);
-void GameManagerUpdateGUI(GameManager *manager);
 void GameManagerDraw(const GameManager *manager);
 void GameManagerUnload(GameManager *manager);
 
