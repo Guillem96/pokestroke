@@ -10,6 +10,7 @@
 #include "pkmn_spawn_anim.h"
 #include "dialog_box.h"
 #include "utils.h"
+#include "ribbons.h"
 
 // "Business" logic functions
 static void SpawnRandomPokemon(GameManager *manager);
@@ -213,11 +214,13 @@ static void SpawnRandomPokemon(GameManager *manager)
     unsigned int pokemonId = SampleFromWeightedDistribution(POKEMON_SPAWN_WEIGHTS, POKEMON_COUNT);
     float variantRoll = (float)rand() / (float)RAND_MAX;
     unsigned short variant;
-    if (variantRoll < PKMN_BW_PROBABILITY)
+    bool shinyCharmMultiplier = RibbonShinyCharmAvailable(manager->gameState) ? 2 : 1;
+
+    if (variantRoll < PKMN_BW_PROBABILITY * shinyCharmMultiplier)
     {
         variant = PKMN_VARIANT_BW;
     }
-    else if (variantRoll < PKMN_SHINY_PROBABILITY)
+    else if (variantRoll < PKMN_SHINY_PROBABILITY * shinyCharmMultiplier)
     {
         variant = PKMN_VARIANT_SHINY;
     }
