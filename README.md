@@ -72,6 +72,10 @@ Click the menu bar icon and select "Show Pokedex".
 
 <img src="img/pokedex_1.png" width="300" />
 
+## Complete all the challenges
+
+<img src="img/trainer_card.png" width="300" />
+
 ## 🚀 Installation
 
 You can install Pokestroke instantly using the terminal. This will download the latest release for your platform and set up the required resources in $HOME/.pokestroke.
@@ -152,8 +156,8 @@ Planned improvements and features:
 - [x] Render number of keystrokes pressed
 - [x] MacOS & Windows installer
 - [x] CI/CD to build and release the installer
-- [ ] Trainer card
-- [ ] Use Mono font
+- [x] Trainer card
+- [ ] Improve font rendering
 
 ## 🛠️ Built With
 

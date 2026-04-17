@@ -9,7 +9,7 @@
 #include "dialog_box.h"
 
 #define TRAINER_CARD_WINDOW_WIDTH 512
-#define TRAINER_CARD_WINDOW_HEIGHT 670
+#define TRAINER_CARD_WINDOW_HEIGHT 700
 
 typedef struct
 {
@@ -22,6 +22,8 @@ typedef struct
     // State
     unsigned int selectedRibbon;
     unsigned int page;
+    unsigned int elapsedFrames;
+    bool selectionEnabled;
 } TrainerCardGUI;
 
 void TrainerCardGUIInit(TrainerCardGUI *tcg, RibbonSheet *ribbonSheet, ShinySparkleSheet *shinySparkleSheet, ShinyCharmSheet *shinyCharmSheet, GameState *gameState);
